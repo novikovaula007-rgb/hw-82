@@ -16,6 +16,21 @@ tracksRouter.get('/', async (req, res, next) => {
     }
 });
 
+tracksRouter.get('/:artist_id', async (req, res, next) => {
+    const {artist_id} = req.params;
+
+    try {
+        if (artist_id) {
+            const albums = await Album.find({artist: artist_id});
+            const albums_ids = albums.map(album => {return album._id});
+            const tracks = await Track.find({album: albums_ids}).populate('album');
+            return res.send(tracks);
+        }
+    } catch (e) {
+        next(e);
+    }
+});
+
 tracksRouter.post('/', async (req, res, next) => {
     const newTrack: ITrack = {
         title: req.body.title,
@@ -36,6 +51,6 @@ tracksRouter.post('/', async (req, res, next) => {
     } catch (e) {
         next(e)
     }
-})
+});
 
 export default tracksRouter;
