@@ -1,12 +1,16 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import artistsRouter from "./routes/artists";
 
 const port = 8000;
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
+
+app.use('/artists', artistsRouter);
 
 const run = async () => {
     await mongoose.connect('mongodb://localhost/music-api-js-30-ulyana');
