@@ -2,6 +2,7 @@ import express from "express";
 import Album from "../models/Album";
 import {IAlbum} from "../types";
 import {imagesUpload} from "../multer";
+import Artist from "../models/Artist";
 
 const albumsRouter = express.Router();
 
@@ -26,6 +27,12 @@ albumsRouter.post('/', imagesUpload.single('image'), async (req, res, next) => {
     }
 
     try {
+        const artistExists = await Artist.findById(req.body.artist);
+
+        if (!artistExists) {
+            return res.status(404).send({error: 'Artist not found'});
+        }
+
         const album = new Album(newAlbum);
         await album.save();
         res.send(album);
