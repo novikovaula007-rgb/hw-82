@@ -5,7 +5,7 @@ import {IArtist} from "../types";
 
 const artistsRouter = express.Router();
 
-artistsRouter.get('', async (req, res, next) => {
+artistsRouter.get('/', async (req, res, next) => {
     try {
         const artists = await Artist.find();
         res.send(artists);
@@ -14,7 +14,7 @@ artistsRouter.get('', async (req, res, next) => {
     }
 });
 
-artistsRouter.post('', imagesUpload.single('image'), async (req, res, next) => {
+artistsRouter.post('/', imagesUpload.single('image'), async (req, res, next) => {
     const newArtist: IArtist = {
         name: req.body.name,
         description: req.body.description,
