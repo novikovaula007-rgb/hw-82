@@ -11,6 +11,8 @@ usersRouter.post('/', async (req, res, next) => {
             password: req.body.password
         });
 
+        user.generateToken();
+
         await user.save();
         return res.send(user);
     } catch (e) {
@@ -31,6 +33,10 @@ usersRouter.post('/sessions', async (req, res) => {
     if (!isMatch) {
         return res.status(400).send({error: 'Password is wrong'});
     }
-    return res.send({message: 'Username and password correct!'});
+
+    user.generateToken();
+    await user.save();
+
+    return res.send({message: 'Username and password correct!', user});
 });
 
