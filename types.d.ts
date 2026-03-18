@@ -23,3 +23,9 @@ export interface IUserFields {
     password: string,
     token: string
 }
+
+export interface ITrackHistory {
+    user: string,
+    track: string,
+    datetime: Date
+}
