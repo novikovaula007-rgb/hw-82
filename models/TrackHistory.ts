@@ -2,7 +2,7 @@ import mongoose, {Schema} from "mongoose";
 
 const trackHistorySchema = new mongoose.Schema({
     user: {
-        type: Schema.Types.ObjectId,
+        type: String,
         required: true
     },
     track: {

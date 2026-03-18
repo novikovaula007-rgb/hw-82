@@ -6,6 +6,7 @@ import artistsRouter from "./routes/artists";
 import albumsRouter from "./routes/albums";
 import tracksRouter from "./routes/tracks";
 import {usersRouter} from "./routes/users";
+import trackHistoryRouter from "./routes/track_history";
 
 const port = 8000;
 const app = express();
@@ -18,6 +19,7 @@ app.use('/artists', artistsRouter);
 app.use('/albums', albumsRouter);
 app.use('/tracks', tracksRouter);
 app.use('/users', usersRouter);
+app.use('/track_history', trackHistoryRouter);
 
 const run = async () => {
     await mongoose.connect('mongodb://localhost/music-api-js-30-ulyana');
