@@ -20,4 +20,17 @@ usersRouter.post('/', async (req, res, next) => {
 
         return next(e);
     }
-})
+});
+
+usersRouter.post('/sessions', async (req, res) => {
+    const user = await User.findOne({username: req.body.username});
+    if (!user) {
+        return res.status(400).send({error: 'Username not found'});
+    }
+    const isMatch = await user.checkPassword(req.body.password);
+    if (!isMatch) {
+        return res.status(400).send({error: 'Password is wrong'});
+    }
+    return res.send({message: 'Username and password correct!'});
+});
+
