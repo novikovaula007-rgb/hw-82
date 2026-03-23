@@ -13,8 +13,23 @@ const trackSchema = new mongoose.Schema({
     duration: {
         type: String,
         required: true
+    },
+    track_number: {
+        type: Number
     }
 });
+
+trackSchema.pre('save', async function() {
+    if (this.isNew) {
+        const lastTrack = await Track.findOne({album: this.album}).sort('-track_number');
+
+        if (lastTrack && lastTrack.track_number) {
+            this.track_number = lastTrack.track_number + 1;
+        } else {
+            this.track_number = 1;
+        }
+    }
+})
 
 const Track = mongoose.model('Track', trackSchema);
 export default Track;
