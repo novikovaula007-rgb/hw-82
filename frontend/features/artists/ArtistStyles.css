@@ -1,0 +1,39 @@
+.artist-card-wrapper {
+    padding: 15px;
+    display: inline-block;
+    border-radius: 5%;
+    transition: box-shadow 0.1s ease-in-out;
+    cursor: pointer;
+    -webkit-box-shadow: 1px 1px 8px 3px rgba(72, 75, 77, 0.15);
+    -moz-box-shadow: 1px 1px 8px 3px rgba(72, 75, 77, 0.15);
+    box-shadow: 1px 1px 8px 3px rgba(72, 75, 77, 0.15);
+}
+
+.artist-card-wrapper:hover {
+    -webkit-box-shadow: 1px 1px 8px 3px rgba(72, 75, 77, 0.08);
+    -moz-box-shadow: 1px 1px 8px 3px rgba(72, 75, 77, 0.08);
+    box-shadow: 1px 1px 8px 3px rgba(72, 75, 77, 0.08);
+}
+
+.artist-photo {
+    border-radius: 100%;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.artist-name {
+    text-align: center;
+    color: #2e2e2e;
+}
+
+.artists-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    justify-items: center;
+    gap: 20px;
+}
+

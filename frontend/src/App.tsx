@@ -5,7 +5,8 @@ const App = () => {
     return (
         <>
             <Navbar/>
-            <Container></Container>
+            <Container sx={{marginTop: '25px'}}>
+            </Container>
         </>
     )
 }
