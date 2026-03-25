@@ -13,7 +13,7 @@ const NavBar = () => {
                         Music app
                     </Typography>
 
-                    <Button color='inherit' to='/artists' component={NavLink}>Artists</Button>
+                    <Button color='inherit' to='/' component={NavLink}>Artists</Button>
                 </Toolbar>
             </AppBar>
         </Box>
