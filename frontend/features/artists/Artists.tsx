@@ -21,7 +21,7 @@ const Artists = () => {
             {!artistsLoading && artists.length === 0 && 'No artists yet.'}
             {!artistsLoading && artists.length > 0 && (
                 <Box className='artists-list'>{artists.map(artist => {
-                    return <ArtistCard key={artist._id} photo={artist.photo} name={artist.name}/>
+                    return <ArtistCard key={artist._id} photo={artist.photo} name={artist.name} id={artist._id}/>
                 })}</Box>
             )}
         </Box>

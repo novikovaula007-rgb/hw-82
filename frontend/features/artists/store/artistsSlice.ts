@@ -5,6 +5,7 @@ import type {RootState} from "../../../app/store.ts";
 
 interface artistsState {
     items: IArtist[],
+    selectedItem: IArtist | null,
     loading: {
         loadingAllArtists: boolean
     }
@@ -12,6 +13,7 @@ interface artistsState {
 
 const initialState: artistsState = {
     items: [],
+    selectedItem: null,
     loading: {
         loadingAllArtists: false
     }
@@ -25,10 +27,22 @@ export const fetchArtists = createAsyncThunk<IArtist[], void>(
     }
 )
 
+export const fetchSelectedArtist = createAsyncThunk<IArtist, string>(
+    'artists/fetchSelectedArtist',
+    async (id) => {
+        const response = await axiosAPI.get<IArtist>(`/artists/${id}`);
+        return response.data;
+    }
+);
+
 const artistsSlice = createSlice({
     name: "artists",
     initialState,
-    reducers: {},
+    reducers: {
+        clearSelectedArtist: (state) => {
+            state.selectedItem = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchArtists.pending, (state) => {
@@ -41,10 +55,20 @@ const artistsSlice = createSlice({
             .addCase(fetchArtists.rejected, (state) => {
                 state.loading.loadingAllArtists = false;
             })
+            .addCase(fetchSelectedArtist.pending, (state) => {
+                state.loading.loadingAllArtists = true;
+            }).addCase(fetchSelectedArtist.fulfilled, (state, {payload}) => {
+                state.loading.loadingAllArtists = false;
+                state.selectedItem = payload;
+            }).addCase(fetchSelectedArtist.rejected, (state) => {
+                state.loading.loadingAllArtists = false;
+            });
     }
 });
 
 export const selectArtists = (state: RootState) => state.artists.items;
 export const selectArtistsLoading = (state: RootState) => state.artists.loading;
+export const selectSelectedArtist = (state: RootState) => state.artists.selectedItem;
 
+export const {clearSelectedArtist} = artistsSlice.actions;
 export const artistsReducer = artistsSlice.reducer;

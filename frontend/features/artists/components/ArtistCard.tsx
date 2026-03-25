@@ -1,19 +1,20 @@
 import {Box, Typography} from "@mui/material";
 import * as React from "react";
 import "../ArtistStyles.css";
+import {NavLink} from "react-router-dom";
 
 interface Props {
     photo: string | null,
-    name: string
+    name: string,
+    id: string
 }
 
-const ArtistCard: React.FC<Props> = ({photo, name}) => {
-    let initialPhoto = '123';
+const ArtistCard: React.FC<Props> = ({photo, name, id}) => {
+    let initialPhoto = 'https://i.ytimg.com/vi/w6geNk3QnBQ/sddefault.jpg';
     if (photo) initialPhoto = `http://localhost:8000/${photo}`;
-    console.log(initialPhoto)
 
     return (
-        <Box className='artist-card-wrapper'>
+        <Box className='artist-card-wrapper' component={NavLink} to={`/artist/${id}`}>
             <img src={initialPhoto} className='artist-photo' alt={name}/>
             <Typography className='artist-name' variant='h5'>
                 {name}
