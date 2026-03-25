@@ -15,7 +15,7 @@ export interface IArtist {
 export interface ITrack {
     title: string,
     duration: string,
-    album: string
+    album: string,
 }
 
 export interface IUserFields {
