@@ -13,7 +13,7 @@ import {
     selectSelectedArtist
 } from "../artists/store/artistsSlice.ts";
 
-const AlbumAlbums = () => {
+const ArtistAlbums = () => {
     const dispatch = useAppDispatch();
 
     const albums = useAppSelector(selectAlbums);
@@ -73,4 +73,4 @@ const AlbumAlbums = () => {
     );
 };
 
-export default AlbumAlbums;
+export default ArtistAlbums;

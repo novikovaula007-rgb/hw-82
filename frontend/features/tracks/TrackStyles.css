@@ -1,0 +1,19 @@
+.track-card-wrapper {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.track-card-wrapper:hover {
+    background-color: #f4f4f4;
+}
+
+.album-image {
+    display: block;
+    width: 40%;
+    height: 40%;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
