@@ -24,18 +24,13 @@ export interface IUserFields {
     token: string
 }
 
-export interface ITrackHistory {
-    user: string,
-    track: string,
-    datetime: Date
-}
-
 interface IArtistPopulated {
     name: string;
 }
 
 interface IAlbumPopulated {
     title: string;
+    image: string,
     artist: IArtistPopulated;
 }
 

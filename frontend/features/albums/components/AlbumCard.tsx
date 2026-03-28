@@ -1,4 +1,4 @@
-import {Box, Typography} from "@mui/material";
+import {Avatar, Box, Typography} from "@mui/material";
 import * as React from "react";
 import "../AlbumStyles.css";
 import {NavLink} from "react-router-dom";
@@ -11,12 +11,9 @@ interface Props {
 }
 
 const ArtistCard: React.FC<Props> = ({id, title, release_year, image}) => {
-    let initialPhoto = 'https://i.ytimg.com/vi/w6geNk3QnBQ/sddefault.jpg';
-    if (image) initialPhoto = `http://localhost:8000/${image}`;
-
     return (
         <Box className='album-card-wrapper' component={NavLink} to={`/album/${id}`}>
-            <img src={initialPhoto} className='album-photo' alt={title}/>
+            <Avatar src={`http://localhost:8000/${image}`} variant="rounded" sx={{width: 200, height: 200, boxShadow: 2, marginBottom: '20px'}}/>
             <Box className='album-text-wrapper'>
                 <Typography className='album-title' variant='h6'>
                     {title}

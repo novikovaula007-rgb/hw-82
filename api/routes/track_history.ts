@@ -52,10 +52,12 @@ trackHistoryRouter.get('/', auth, async (req, res, next) => {
         const user = (req as RequestWithUser).user;
         if (user) {
             const tracks = await TrackHistory.find({user: user._id})
+                .sort({datetime: -1})
                 .populate({
                     path: 'track',
                     populate: {
                         path: 'album',
+                        select: 'image title',
                         populate: {path: 'artist', select: 'name'}
                     }
                 })
@@ -67,6 +69,7 @@ trackHistoryRouter.get('/', auth, async (req, res, next) => {
                 trackName: item.track.title,
                 trackDuration: item.track.duration,
                 artistName: item.track.album.artist.name,
+                albumImage: item.track.album.image,
                 albumTitle: item.track.album.title
             }));
 

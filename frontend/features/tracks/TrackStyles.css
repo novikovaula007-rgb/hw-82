@@ -2,12 +2,19 @@
     padding: 10px 15px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     border-radius: 10px;
     transition: 0.3s;
 }
 
 .track-card-wrapper:hover {
     background-color: #f4f4f4;
+}
+
+.album-text-card {
+    overflow-wrap: break-word;
+    max-width: 30%;
+    text-wrap: wrap;
 }
 
 .album-image {

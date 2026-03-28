@@ -68,8 +68,14 @@ const AlbumTracks = () => {
                 {!tracksLoading && tracks.length > 0 && selectedAlbum && (
                     <Stack>
                         {tracks.map(track => {
-                            return <TrackCard key={track._id} artist={selectedAlbum.artist.name} title={track.title}
-                                              duration={track.duration} track_number={track.track_number}/>
+                            return <TrackCard key={track._id}
+                                              id={track._id}
+                                              artist={selectedAlbum.artist.name}
+                                              title={track.title}
+                                              duration={track.duration}
+                                              track_number={track.track_number}
+                                              album={selectedAlbum.title}
+                            />
                         })}
                     </Stack>
                 )}

@@ -14,6 +14,7 @@ const NavBar = () => {
                     </Typography>
 
                     <Button color='inherit' to='/' component={NavLink}>Artists</Button>
+                    <Button color='inherit' to='/track-history' component={NavLink}>Track history</Button>
                 </Toolbar>
             </AppBar>
         </Box>

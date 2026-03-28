@@ -7,7 +7,7 @@ export interface IAlbum {
     image: string | null
 }
 
-export interface IAlbumMutation extends IAlbum{
+export interface IAlbumMutation extends IAlbum {
     artist: IArtist,
 }
 
@@ -24,4 +24,14 @@ export interface ITrack {
     duration: string,
     album: string,
     track_number: number
+}
+
+export interface ITrackHistory {
+    _id: string,
+    datetime: Date,
+    trackName: string,
+    trackDuration: string,
+    artistName: string,
+    albumTitle: string,
+    albumImage: string
 }
