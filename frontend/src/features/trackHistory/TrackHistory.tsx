@@ -5,15 +5,22 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 import {fetchTrackHistory, selectTrackHistory, selectTrackHistoryLoading} from "./store/trackHistorySlice.ts";
 import TrackCard from "../tracks/components/TrackCard.tsx";
 import "./TrackHistoryStyles.css";
+import {selectUser} from "../users/store/usersSlice.ts";
+import {useNavigate} from "react-router";
 
 const TrackHistory = () => {
     const dispatch = useAppDispatch();
     const tracks = useAppSelector(selectTrackHistory);
     const tracksLoading = useAppSelector(selectTrackHistoryLoading).loadingAllTracks;
+    const user = useAppSelector(selectUser);
+    const navigate = useNavigate();
+
+    if (!user) {
+        navigate('/login');
+    }
 
     useEffect(() => {
         dispatch(fetchTrackHistory());
-        console.log(tracks)
     }, [dispatch]);
 
     return (

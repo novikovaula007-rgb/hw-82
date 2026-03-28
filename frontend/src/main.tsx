@@ -6,16 +6,19 @@ import {Provider} from "react-redux";
 import {CssBaseline} from "@mui/material";
 import {ToastContainer} from "react-toastify";
 import {BrowserRouter} from "react-router";
-import {store} from "./app/store.ts";
+import {persistor, store} from "./app/store.ts";
+import {PersistGate} from 'redux-persist/integration/react';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <Provider store={store}>
-            <BrowserRouter>
-                <CssBaseline/>
-                <App/>
-                <ToastContainer/>
-            </BrowserRouter>
+            <PersistGate persistor={persistor}>
+                <BrowserRouter>
+                    <CssBaseline/>
+                    <App/>
+                    <ToastContainer/>
+                </BrowserRouter>
+            </PersistGate>
         </Provider>
     </StrictMode>,
 );

@@ -17,17 +17,27 @@ const initialState: trackHistoryState = {
     }
 };
 
-export const addNewEntry = createAsyncThunk<void, string>(
+export const addNewEntry = createAsyncThunk<void, string, { state: RootState }>(
     "trackHistory/addNewEntry",
-    async (trackID) => {
-        await axiosAPI.post('track_history', {track: trackID});
+    async (trackID, {getState}) => {
+        const token = getState().users.user?.token;
+        await axiosAPI.post('track_history', {track: trackID}, {
+            headers: {
+                'Authorization': token
+            }
+        });
     }
 );
 
-export const fetchTrackHistory = createAsyncThunk<ITrackHistory[], void>(
+export const fetchTrackHistory = createAsyncThunk<ITrackHistory[], void, { state: RootState }>(
     "trackHistory/fetchTrackHistory",
-    async () => {
-        const response = await axiosAPI.get<ITrackHistory[]>('track_history');
+    async (_, {getState}) => {
+        const token = getState().users.user?.token;
+        const response = await axiosAPI.get<ITrackHistory[]>('track_history', {
+            headers: {
+                'Authorization': token
+            }
+        });
         return response.data;
     }
 );

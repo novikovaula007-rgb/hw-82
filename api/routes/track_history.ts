@@ -63,17 +63,20 @@ trackHistoryRouter.get('/', auth, async (req, res, next) => {
                 })
                 .lean() as unknown as ITrackHistoryPopulated[];
 
-            const trackObjectsArray = tracks.map(item => ({
-                _id: item._id,
-                datetime: item.datetime,
-                trackName: item.track.title,
-                trackDuration: item.track.duration,
-                artistName: item.track.album.artist.name,
-                albumImage: item.track.album.image,
-                albumTitle: item.track.album.title
-            }));
+            if (tracks) {
+                const trackObjectsArray = tracks.map(item => ({
+                    _id: item._id,
+                    datetime: item.datetime,
+                    trackName: item.track.title,
+                    trackDuration: item.track.duration,
+                    artistName: item.track.album.artist.name,
+                    albumImage: item.track.album.image,
+                    albumTitle: item.track.album.title
+                }));
 
-            return res.send(trackObjectsArray);
+                return res.send(trackObjectsArray);
+            }
+
         }
     } catch (e) {
         if (e instanceof Error.ValidationError) {

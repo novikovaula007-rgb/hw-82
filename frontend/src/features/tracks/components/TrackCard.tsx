@@ -3,8 +3,10 @@ import {Avatar, Box, IconButton, Typography} from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import * as React from "react";
 import dayjs from "dayjs";
-import {useAppDispatch} from "../../../app/hooks.ts";
+import {useAppDispatch, useAppSelector} from "../../../app/hooks.ts";
 import {addNewEntry} from "../../trackHistory/store/trackHistorySlice.ts";
+import {selectUser} from "../../users/store/usersSlice.ts";
+import {toast} from "react-toastify";
 
 interface Props {
     id: string,
@@ -20,10 +22,15 @@ interface Props {
 
 const TrackCard: React.FC<Props> = ({id, artist, title, duration, track_number, album, isHistory = false, datetime, albumImage}) => {
     const dispatch = useAppDispatch();
+    const user = useAppSelector(selectUser);
 
     const toListenTrack = async () => {
         try {
-            await dispatch(addNewEntry(id));
+            if (user) {
+                await dispatch(addNewEntry(id));
+            } else {
+                toast.error('You must be logged in to listen to music.');
+            }
         } catch (e) {
             console.log(e);
         }

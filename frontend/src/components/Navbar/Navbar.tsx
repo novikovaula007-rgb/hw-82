@@ -2,8 +2,8 @@ import {AppBar, Box, Button, Toolbar, Typography} from "@mui/material";
 import {NavLink} from "react-router-dom";
 import {useAppSelector} from "../../app/hooks.ts";
 import {selectUser} from "../../features/users/store/usersSlice.ts";
-import AnonymousMenu from "./UserMenu.tsx";
 import UserMenu from "./UserMenu.tsx";
+import AnonymousMenu from "./AnonymousMenu.tsx";
 
 const NavBar = () => {
     const user = useAppSelector(selectUser);
