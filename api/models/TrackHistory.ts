@@ -2,11 +2,13 @@ import mongoose, {Schema} from "mongoose";
 
 const trackHistorySchema = new mongoose.Schema({
     user: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     track: {
         type: Schema.Types.ObjectId,
+        ref: 'Track',
         required: true
     },
     datetime: {

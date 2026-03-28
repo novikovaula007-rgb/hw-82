@@ -29,3 +29,24 @@ export interface ITrackHistory {
     track: string,
     datetime: Date
 }
+
+interface IArtistPopulated {
+    name: string;
+}
+
+interface IAlbumPopulated {
+    title: string;
+    artist: IArtistPopulated;
+}
+
+interface ITrackPopulated {
+    title: string;
+    duration: string;
+    album: IAlbumPopulated;
+}
+
+interface ITrackHistoryPopulated {
+    _id: string;
+    datetime: Date;
+    track: ITrackPopulated;
+}

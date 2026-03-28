@@ -1,36 +1,77 @@
 import express from "express";
-import User from "../models/User";
-import {Error} from "mongoose";
+import mongoose, {Error} from "mongoose";
 import trackHistory from "../models/TrackHistory";
-import {ITrackHistory} from "../types";
+import {ITrackHistoryPopulated} from "../types";
+import auth, {RequestWithUser} from "../middleware/auth";
+import Track from "../models/Track";
+import TrackHistory from "../models/TrackHistory";
 
 const trackHistoryRouter = express.Router();
 
-trackHistoryRouter.post('/', async (req, res, next) => {
+trackHistoryRouter.post('/', auth, async (req, res, next) => {
     try {
-        const token = req.get('Authorization');
+        const user = (req as RequestWithUser).user;
+        const trackID = req.body.track;
 
-        if (!token) {
-            return res.status(401).send({error: 'No token present'});
+        if (!trackID) {
+            return res.status(401).send({error: 'No track ID present'})
         }
 
-        const user = await User.findOne({token});
-
-        if (!user) {
-            return res.status(401).send({error: 'Wrong token!'});
+        if (trackID && !mongoose.Types.ObjectId.isValid(trackID as string)) {
+            return res.status(400).send({error: 'Invalid track ID format'});
         }
 
-        const track = req.body.track
+        const track = await Track.findById(trackID);
 
-        const newEntry: ITrackHistory = {
-            user: user.username,
-            track: track,
-            datetime: new Date()
+        if (!track) {
+            return res.status(404).send({error: 'Track not found'});
         }
 
-        const entry = new trackHistory(newEntry);
-        await entry.save();
-        return res.send(entry);
+        if (user) {
+            const newEntry = {
+                user: user._id,
+                track: trackID,
+                datetime: new Date()
+            }
+
+            const entry = new trackHistory(newEntry);
+            await entry.save();
+            return res.send({entry, track});
+        }
+    } catch (e) {
+        if (e instanceof Error.ValidationError) {
+            return res.status(400).send(e);
+        }
+
+        return next(e);
+    }
+});
+
+trackHistoryRouter.get('/', auth, async (req, res, next) => {
+    try {
+        const user = (req as RequestWithUser).user;
+        if (user) {
+            const tracks = await TrackHistory.find({user: user._id})
+                .populate({
+                    path: 'track',
+                    populate: {
+                        path: 'album',
+                        populate: {path: 'artist', select: 'name'}
+                    }
+                })
+                .lean() as unknown as ITrackHistoryPopulated[];
+
+            const trackObjectsArray = tracks.map(item => ({
+                _id: item._id,
+                datetime: item.datetime,
+                trackName: item.track.title,
+                trackDuration: item.track.duration,
+                artistName: item.track.album.artist.name,
+                albumTitle: item.track.album.title
+            }));
+
+            return res.send(trackObjectsArray);
+        }
     } catch (e) {
         if (e instanceof Error.ValidationError) {
             return res.status(400).send(e);
@@ -39,5 +80,6 @@ trackHistoryRouter.post('/', async (req, res, next) => {
         return next(e);
     }
 })
+
 
 export default trackHistoryRouter;
