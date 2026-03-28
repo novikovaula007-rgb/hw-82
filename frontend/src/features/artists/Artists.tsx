@@ -1,7 +1,7 @@
 import {useEffect} from 'react';
 import {Box, Typography} from "@mui/material";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {selectArtists, selectArtistsLoading, fetchArtists} from "./store/artistsSlice";
+import {fetchArtists, selectArtists, selectArtistsLoading} from "./store/artistsSlice";
 import Spinner from "../../components/UI/Spinner/Spinner";
 import ArtistCard from "./components/ArtistCard";
 

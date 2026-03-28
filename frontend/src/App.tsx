@@ -1,4 +1,4 @@
-import {Route, Routes } from "react-router";
+import {Route, Routes} from "react-router";
 import Navbar from "../components/Navbar/Navbar.tsx";
 import {Container} from "@mui/material";
 import NotFoundPage from "../components/NotFoundPage/NotFoundPage.tsx";
