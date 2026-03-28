@@ -1,7 +1,7 @@
-import type {IArtist} from "../../../types";
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
+import type {IArtist} from "../../../../types";
 
 interface artistsState {
     items: IArtist[],

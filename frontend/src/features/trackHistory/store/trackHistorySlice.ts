@@ -1,7 +1,7 @@
-import type {ITrackHistory} from "../../../types";
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
+import type {ITrackHistory} from "../../../../types";
 
 interface trackHistoryState {
     items: ITrackHistory[],

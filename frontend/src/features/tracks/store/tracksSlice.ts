@@ -1,7 +1,7 @@
-import type {ITrack} from "../../../types";
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
+import type {ITrack} from "../../../../types";
 
 interface tracksState {
     items: ITrack[],

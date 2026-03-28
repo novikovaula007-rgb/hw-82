@@ -1,7 +1,7 @@
-import type {IAlbum, IAlbumMutation} from "../../../types";
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
+import type {IAlbum, IAlbumMutation} from "../../../../types";
 
 interface albumsState {
     items: IAlbum[],

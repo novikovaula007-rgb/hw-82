@@ -1,7 +1,13 @@
 import {AppBar, Box, Button, Toolbar, Typography} from "@mui/material";
 import {NavLink} from "react-router-dom";
+import {useAppSelector} from "../../app/hooks.ts";
+import {selectUser} from "../../features/users/store/usersSlice.ts";
+import AnonymousMenu from "./UserMenu.tsx";
+import UserMenu from "./UserMenu.tsx";
 
 const NavBar = () => {
+    const user = useAppSelector(selectUser);
+
     return (
         <Box sx={{flexGrow: 1}}>
             <AppBar position='static' sx={{backgroundColor: '#171717', top: 0, left: 0, right: 0}}>
@@ -14,7 +20,7 @@ const NavBar = () => {
                     </Typography>
 
                     <Button color='inherit' to='/' component={NavLink}>Artists</Button>
-                    <Button color='inherit' to='/track-history' component={NavLink}>Track history</Button>
+                    {user ? <UserMenu/> : <AnonymousMenu/>}
                 </Toolbar>
             </AppBar>
         </Box>
