@@ -4,6 +4,9 @@ import {imagesUpload} from "../multer";
 import {IArtist} from "../types";
 import Album from "../models/Album";
 import albumsRouter from "./albums";
+import auth, {RequestWithUser} from "../middleware/auth";
+import Track from "../models/Track";
+import permit from "../middleware/permit";
 
 const artistsRouter = express.Router();
 
@@ -36,17 +39,86 @@ albumsRouter.get('/:album_id', async (req, res, next) => {
     }
 });
 
-artistsRouter.post('/', imagesUpload.single('photo'), async (req, res, next) => {
-    const newArtist: IArtist = {
-        name: req.body.name,
-        description: req.body.description,
-        photo: req.file ? 'images/' + req.file.filename : null
-    };
+artistsRouter.post('/', auth, imagesUpload.single('photo'), async (req, res, next) => {
+    const {user} = req as RequestWithUser;
 
     try {
-        const artist = new Artist(newArtist);
-        await artist.save();
-        res.send(artist);
+        if (user) {
+            const newArtist: IArtist = {
+                name: req.body.name,
+                description: req.body.description,
+                photo: req.file ? 'images/' + req.file.filename : null,
+                user: user._id.toString()
+            };
+
+            const artist = new Artist(newArtist);
+            await artist.save();
+            res.send(artist);
+        }
+    } catch (e) {
+        next(e);
+    }
+});
+
+artistsRouter.delete('/:artist_id', auth, async (req, res, next) => {
+    const {user} = req as RequestWithUser;
+    const {artist_id} = req.params;
+
+    try {
+        if (user) {
+            const artist = await Artist.findById(artist_id);
+
+            if (!artist) {
+                return res.status(404).send({error: 'Artist not found'});
+            }
+
+            if ((user.role === 'admin') || (user.role === 'user' && artist.user.toString() === user._id.toString() && !artist.isPublished)) {
+                const albums = await Album.find({artist: artist_id as string});
+                const albumIDArray = albums.map(album => album._id);
+
+                await Track.deleteMany({album: {$in: albumIDArray}});
+                await Album.deleteMany({artist: artist_id as string});
+                await Artist.findByIdAndDelete(artist_id);
+                return res.send({message: 'Artist and related albums & tracks were successfully deleted'});
+            }
+
+            if (user.role === 'user' && artist.user.toString() !== user._id.toString()) {
+                return res.status(403).send({message: 'You are not allowed to delete this artist'});
+            }
+        }
+    } catch (e) {
+        next(e);
+    }
+});
+
+artistsRouter.patch('/:id/togglePublished', auth, permit('admin'), async (req, res, next) => {
+    const {user} = req as RequestWithUser;
+    const {id} = req.params;
+
+    try {
+        if (user) {
+            const artist = await Artist.findById(id);
+
+            if (!artist) {
+                return res.status(404).send({error: 'Artist not found'});
+            }
+
+            artist.isPublished = !artist.isPublished;
+            await artist.save();
+
+            if (!artist.isPublished) {
+                const albums = await Album.find({artist: artist._id});
+                const albumIDArray = albums.map(a => a._id);
+
+                await Album.updateMany({artist: artist._id}, {isPublished: false});
+                await Track.updateMany({album: {$in: albumIDArray}}, {isPublished: false});
+            }
+
+            return res.send({
+                message: `Artist status changed to ${artist.isPublished ? 'published' : 'unpublished'}`,
+                artist,
+            });
+        }
     } catch (e) {
         next(e);
     }

@@ -1,8 +1,13 @@
-import mongoose from "mongoose";
+import mongoose, {Schema} from "mongoose";
 
 const artistSchema = new mongoose.Schema({
     name: {
         type: String,
+        required: true
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     photo: {

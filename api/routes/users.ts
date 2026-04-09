@@ -1,6 +1,8 @@
 import express from "express";
 import User from "../models/User";
-import {Error} from "mongoose";
+import {Error, HydratedDocument} from "mongoose";
+import auth, {RequestWithUser} from "../middleware/auth";
+import {IUserFields} from "../types";
 
 export const usersRouter = express.Router();
 
@@ -38,5 +40,21 @@ usersRouter.post('/sessions', async (req, res) => {
     await user.save();
 
     return res.send({message: 'Username and password correct!', user});
+});
+
+usersRouter.delete('/sessions', auth, async (req, res) => {
+    const {user} = req as RequestWithUser;
+
+    if (user) {
+        user.token = '';
+        await (user as HydratedDocument<IUserFields>).save();
+    }
+
+    res.clearCookie('token', {
+        httpOnly: true,
+        sameSite: 'strict',
+    });
+
+    res.send({message: 'Logged out successfully.'});
 });
 

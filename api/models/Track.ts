@@ -10,6 +10,11 @@ const trackSchema = new mongoose.Schema({
         ref: 'Album',
         required: true
     },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     duration: {
         type: String,
         required: true

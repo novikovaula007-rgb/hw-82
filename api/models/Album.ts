@@ -10,6 +10,11 @@ const albumSchema = new mongoose.Schema({
         ref: 'Artist',
         required: true
     },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     release_year: {
         type: Number,
         required: true

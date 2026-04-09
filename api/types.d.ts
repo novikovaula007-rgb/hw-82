@@ -4,21 +4,24 @@ export interface IAlbum {
     release_year: number,
     description: string | null,
     image: string | null,
-    isPublished: boolean
+    isPublished?: boolean,
+    user: string
 }
 
 export interface IArtist {
     name: string,
     description: string | null,
     photo: string | null,
-    isPublished: boolean
+    isPublished?: boolean,
+    user: string
 }
 
 export interface ITrack {
     title: string,
     duration: string,
     album: string,
-    isPublished: boolean
+    isPublished?: boolean,
+    user: string
 }
 
 export interface IUserFields {
