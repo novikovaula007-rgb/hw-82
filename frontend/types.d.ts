@@ -15,7 +15,7 @@ export interface IAlbumMutation extends IAlbum {
 export interface IAlbumForm {
     title: string,
     artist: string,
-    release_year: number,
+    release_year: number | null,
     description: string | null,
     image: File | string | null;
 }

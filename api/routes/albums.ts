@@ -3,7 +3,6 @@ import Album from "../models/Album";
 import {IAlbum} from "../types";
 import {imagesUpload} from "../multer";
 import Artist from "../models/Artist";
-import mongoose from "mongoose";
 import auth, {RequestWithUser} from "../middleware/auth";
 import Track from "../models/Track";
 import permit from "../middleware/permit";
@@ -11,20 +10,14 @@ import permit from "../middleware/permit";
 const albumsRouter = express.Router();
 
 albumsRouter.get('/', async (req, res, next) => {
-    const artist = req.query.artist;
-
-    if (artist && !mongoose.Types.ObjectId.isValid(artist as string)) {
-        return res.status(400).send({error: 'Invalid artist ID format'});
-    }
-
-    const artistExists = await Artist.findById(artist);
-
-    if (!artistExists) {
-        return res.status(404).send({error: 'Artist not found'});
-    }
     try {
-        const filter = artist ? {artist: artist} : {};
-        const albums = await Album.find(filter).populate('artist').sort({year: -1});
+        const {artist} = req.query;
+
+        const filter = artist ? {artist} : {};
+
+        const albums = await Album.find(filter as Record<string, unknown>)
+            .populate('artist')
+            .sort({year: -1});
         res.send(albums);
     } catch (e) {
         next(e);

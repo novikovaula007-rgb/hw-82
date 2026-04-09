@@ -26,10 +26,17 @@ export const fetchTracks = createAsyncThunk<ITrack[], string>(
     }
 );
 
-export const createTrack = createAsyncThunk<void, ITrackForm>(
+export const createTrack = createAsyncThunk<void, ITrackForm, { state: RootState }>(
     'tracks/createTrack',
-    async (trackData) => {
-        const response = await axiosAPI.post<{message: string, track: ITrack}>('/tracks', trackData);
+    async (trackData, {getState}) => {
+        const token = getState().users.user?.token;
+
+        const response = await axiosAPI.post<{message: string, track: ITrack}>('/tracks', trackData, {
+            headers: {
+                'Authorization': token
+            }
+        });
+
         toast.success(response.data.message);
     }
 );

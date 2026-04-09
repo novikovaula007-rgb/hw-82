@@ -15,10 +15,19 @@ const UserMenu = () => {
 
     return (
         <>
-            <Button component={NavLink} to='/track-history' color="inherit">
+            <Button component={NavLink} to='/track-history' color="inherit" sx={{margin: "0 15px"}}>
                 Track history
             </Button>
-            <Button color="inherit" onClick={handleLogout}>
+            <Button component={NavLink} to='/tracks/new' color="inherit" sx={{margin: "0 15px"}}>
+                New track
+            </Button>
+            <Button component={NavLink} to='/albums/new' color="inherit" sx={{margin: "0 15px"}}>
+                New album
+            </Button>
+            <Button component={NavLink} to='/artists/new' color="inherit" sx={{margin: "0 15px"}}>
+                New artist
+            </Button>
+            <Button color="inherit" onClick={handleLogout} sx={{margin: "0 15px"}}>
                 Log out
             </Button>
         </>

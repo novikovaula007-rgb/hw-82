@@ -20,10 +20,16 @@ const initialState: albumsState = {
     }
 };
 
-export const fetchAlbums = createAsyncThunk<IAlbum[], string>(
+export const fetchAlbums = createAsyncThunk<IAlbum[], string | null>(
     "albums/fetchAlbums",
     async (id) => {
-        const response = await axiosAPI.get<IAlbum[]>(`albums?artist=${id}`);
+        let stringFetch = 'albums';
+
+        if (id !== null) {
+            stringFetch += `?artist=${id}`
+        }
+
+        const response = await axiosAPI.get<IAlbum[]>(stringFetch);
         return response.data;
     }
 )
@@ -36,10 +42,11 @@ export const fetchSelectedAlbum = createAsyncThunk<IAlbumMutation, string>(
     }
 );
 
-export const createAlbum = createAsyncThunk<void, IAlbumForm>(
+export const createAlbum = createAsyncThunk<void, IAlbumForm, { state: RootState }>(
     'albums/createAlbum',
-    async (albumData) => {
+    async (albumData, {getState}) => {
         const formData = new FormData();
+        const token = getState().users.user?.token;
 
         const keys = Object.keys(albumData) as (keyof IAlbumForm)[];
         keys.forEach(key => {
@@ -53,7 +60,11 @@ export const createAlbum = createAsyncThunk<void, IAlbumForm>(
             }
         });
 
-        const response = await axiosAPI.post<{message: string, album: IAlbum}>('/albums', formData);
+        const response = await axiosAPI.post<{ message: string, album: IAlbum }>('/albums', formData, {
+            headers: {
+                'Authorization': token
+            }
+        });
         toast.success(response.data.message);
     }
 );
@@ -84,11 +95,11 @@ const albumsSlice = createSlice({
             .addCase(fetchSelectedAlbum.pending, (state) => {
                 state.loading.loadingAllAlbums = true;
             }).addCase(fetchSelectedAlbum.fulfilled, (state, {payload}) => {
-                state.loading.loadingAllAlbums = false;
-                state.selectedItem = payload;
-            }).addCase(fetchSelectedAlbum.rejected, (state) => {
-                state.loading.loadingAllAlbums = false;
-            });
+            state.loading.loadingAllAlbums = false;
+            state.selectedItem = payload;
+        }).addCase(fetchSelectedAlbum.rejected, (state) => {
+            state.loading.loadingAllAlbums = false;
+        });
     }
 });
 

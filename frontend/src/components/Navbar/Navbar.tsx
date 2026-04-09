@@ -19,7 +19,7 @@ const NavBar = () => {
                         Music app
                     </Typography>
 
-                    <Button color='inherit' to='/' component={NavLink}>Artists</Button>
+                    <Button color='inherit' to='/' component={NavLink} sx={{margin: "0 15px"}}>Artists</Button>
                     {user ? <UserMenu/> : <AnonymousMenu/>}
                 </Toolbar>
             </AppBar>

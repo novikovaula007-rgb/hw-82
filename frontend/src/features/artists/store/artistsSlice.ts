@@ -36,9 +36,10 @@ export const fetchSelectedArtist = createAsyncThunk<IArtist, string>(
     }
 );
 
-export const createArtist = createAsyncThunk<void, IArtistForm>(
+export const createArtist = createAsyncThunk<void, IArtistForm, { state: RootState }>(
     'artists/createArtist',
-    async (artistData) => {
+    async (artistData, {getState}) => {
+        const token = getState().users.user?.token;
         const formData = new FormData();
 
         const keys = Object.keys(artistData) as (keyof IArtistForm)[];
@@ -53,7 +54,11 @@ export const createArtist = createAsyncThunk<void, IArtistForm>(
             }
         });
 
-        const response = await axiosAPI.post<{message: string, artist: IArtist}>('/artists', formData);
+        const response = await axiosAPI.post<{ message: string, artist: IArtist }>('/artists', formData, {
+            headers: {
+                'Authorization': token
+            }
+        });
         toast.success(response.data.message);
     }
 );
@@ -81,11 +86,11 @@ const artistsSlice = createSlice({
             .addCase(fetchSelectedArtist.pending, (state) => {
                 state.loading.loadingAllArtists = true;
             }).addCase(fetchSelectedArtist.fulfilled, (state, {payload}) => {
-                state.loading.loadingAllArtists = false;
-                state.selectedItem = payload;
-            }).addCase(fetchSelectedArtist.rejected, (state) => {
-                state.loading.loadingAllArtists = false;
-            });
+            state.loading.loadingAllArtists = false;
+            state.selectedItem = payload;
+        }).addCase(fetchSelectedArtist.rejected, (state) => {
+            state.loading.loadingAllArtists = false;
+        });
     }
 });
 
