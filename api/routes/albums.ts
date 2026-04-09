@@ -53,7 +53,10 @@ albumsRouter.post('/', auth, imagesUpload.single('image'), async (req, res, next
 
             const album = new Album(newAlbum);
             await album.save();
-            res.send(album);
+            return res.send({
+                message: 'The album has been successfully created. Please wait for it to be published',
+                album
+            });
         }
     } catch (e) {
         next(e);

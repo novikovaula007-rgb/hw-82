@@ -55,7 +55,10 @@ tracksRouter.post('/', auth, async (req, res, next) => {
 
             const track = new Track(newTrack);
             await track.save();
-            res.send(track)
+            return res.send({
+                message: 'The track has been successfully created. Please wait for it to be published',
+                track
+            });
         }
     } catch (e) {
         next(e)

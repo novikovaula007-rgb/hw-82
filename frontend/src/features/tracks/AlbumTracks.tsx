@@ -1,4 +1,4 @@
-import {Box, Stack, Typography} from "@mui/material";
+import {Avatar, Box, Stack, Typography} from "@mui/material";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {
     clearSelectedAlbum,
@@ -52,10 +52,7 @@ const AlbumTracks = () => {
                 {albumsLoading && <Spinner/>}
                 {!albumsLoading && selectedAlbum && (
                     <Box>
-                        <img src={`http://localhost:8000/${selectedAlbum.image}` || 'https://i.ytimg.com/vi/w6geNk3QnBQ/sddefault.jpg'}
-                             alt={selectedAlbum.title}
-                             className='album-image'
-                        />
+                        <Avatar src={`http://localhost:8000/${selectedAlbum.image}`} variant="rounded" sx={{width: 200, height: 200, boxShadow: 2, marginBottom: '20px'}}/>
                         <Typography sx={{fontSize: '25px'}}>{selectedAlbum.title}</Typography>
                         <Typography sx={{color: '#8a8a8a'}}>{selectedAlbum.description}</Typography>
                     </Box>

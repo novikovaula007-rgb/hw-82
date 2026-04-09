@@ -1,7 +1,8 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
-import type {ITrack} from "../../../../types";
+import type {ITrack, ITrackForm} from "../../../../types";
+import {toast} from "react-toastify";
 
 interface tracksState {
     items: ITrack[],
@@ -23,7 +24,15 @@ export const fetchTracks = createAsyncThunk<ITrack[], string>(
         const response = await axiosAPI.get<ITrack[]>(`tracks?album=${id}`);
         return response.data;
     }
-)
+);
+
+export const createTrack = createAsyncThunk<void, ITrackForm>(
+    'tracks/createTrack',
+    async (trackData) => {
+        const response = await axiosAPI.post<{message: string, track: ITrack}>('/tracks', trackData);
+        toast.success(response.data.message);
+    }
+);
 
 const tracksSlice = createSlice({
     name: "tracks",

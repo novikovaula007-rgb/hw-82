@@ -35,19 +35,19 @@ const Login = () => {
             <Box
                 sx={{
                     marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                 }}
             >
-                <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
+                <Avatar sx={{m: 1, bgcolor: "secondary.main"}}>
                     <LockOpenIcon/>
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
 
-                {error && (<Alert severity='error' sx={{mt: 3, width: '100%'}}>
+                {error && (<Alert severity="error" sx={{mt: 3, width: "100%"}}>
                     {error.error}
                 </Alert>)}
 
@@ -64,6 +64,17 @@ const Login = () => {
                                 autoFocus
                                 value={form.username}
                                 onChange={onInputChange}
+                                sx={{
+                                    "& label.Mui-focused": {color: "secondary.main"},
+                                    "& .MuiOutlinedInput-root": {
+                                        "&:hover fieldset": {
+                                            borderColor: "secondary.main",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "secondary.main",
+                                        },
+                                    },
+                                }}
                             />
                         </Grid>
                         <Grid size={12}>
@@ -77,6 +88,17 @@ const Login = () => {
                                 autoComplete="new-password"
                                 value={form.password}
                                 onChange={onInputChange}
+                                sx={{
+                                    "& label.Mui-focused": {color: "secondary.main"},
+                                    "& .MuiOutlinedInput-root": {
+                                        "&:hover fieldset": {
+                                            borderColor: "secondary.main",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "secondary.main",
+                                        },
+                                    },
+                                }}
                             />
                         </Grid>
                     </Grid>
@@ -84,15 +106,24 @@ const Login = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{mt: 3, mb: 2}}
+                        sx={{mt: 3, mb: 2, backgroundColor: "secondary.main"}}
                     >
-                        Sign Up
+                        Sign In
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid>
-                            <Link to='/register'>
-                                Or sign up
-                            </Link>
+                            <Typography component={Link} to="/register" sx={{
+                                textDecoration: "none",
+                                fontSize: "16px",
+                                color: "text.secondary",
+                                transition: "color 0.3s ease",
+                                "&:hover": {
+                                    color: "#ccc",
+                                    cursor: "pointer"
+                                }
+                            }}>
+                                Don't have an account? Sign up
+                            </Typography>
                         </Grid>
                     </Grid>
                 </Box>

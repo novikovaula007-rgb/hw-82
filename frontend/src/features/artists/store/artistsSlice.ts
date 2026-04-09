@@ -1,7 +1,8 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
-import type {IArtist} from "../../../../types";
+import type {IArtist, IArtistForm} from "../../../../types";
+import {toast} from "react-toastify";
 
 interface artistsState {
     items: IArtist[],
@@ -32,6 +33,28 @@ export const fetchSelectedArtist = createAsyncThunk<IArtist, string>(
     async (id) => {
         const response = await axiosAPI.get<IArtist>(`/artists/${id}`);
         return response.data;
+    }
+);
+
+export const createArtist = createAsyncThunk<void, IArtistForm>(
+    'artists/createArtist',
+    async (artistData) => {
+        const formData = new FormData();
+
+        const keys = Object.keys(artistData) as (keyof IArtistForm)[];
+        keys.forEach(key => {
+            const value = artistData[key];
+            if (value !== null && value !== undefined) {
+                if (value instanceof File) {
+                    formData.append(key, value);
+                } else {
+                    formData.append(key, String(value));
+                }
+            }
+        });
+
+        const response = await axiosAPI.post<{message: string, artist: IArtist}>('/artists', formData);
+        toast.success(response.data.message);
     }
 );
 

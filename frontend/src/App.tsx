@@ -8,6 +8,7 @@ import TrackHistory from "./features/trackHistory/TrackHistory.tsx";
 import Navbar from "./components/Navbar/Navbar.tsx";
 import Register from "./features/users/Register.tsx";
 import Login from "./features/users/Login.tsx";
+import ProtectedRouter from "./components/ProtectedRouter/ProtectedRouter.tsx";
 
 const App = () => {
     return (
@@ -18,7 +19,7 @@ const App = () => {
                     <Route path='/' element={(<Artists/>)}/>
                     <Route path="/register" element={<Register/>}/>
                     <Route path="/login" element={<Login/>}/>
-                    <Route path='/track-history' element={(<TrackHistory/>)}/>
+                    <Route path='/track-history' element={(<ProtectedRouter><TrackHistory/></ProtectedRouter>)}/>
                     <Route path='/artist/:artistId' element={(<ArtistAlbums/>)}/>
                     <Route path='/album/:albumId' element={(<AlbumTracks/>)}/>
                     <Route path='*' element={(<NotFoundPage/>)}/>

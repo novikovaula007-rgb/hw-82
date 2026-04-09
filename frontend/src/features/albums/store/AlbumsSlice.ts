@@ -1,7 +1,8 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
-import type {IAlbum, IAlbumMutation} from "../../../../types";
+import type {IAlbum, IAlbumForm, IAlbumMutation} from "../../../../types";
+import {toast} from "react-toastify";
 
 interface albumsState {
     items: IAlbum[],
@@ -32,6 +33,28 @@ export const fetchSelectedAlbum = createAsyncThunk<IAlbumMutation, string>(
     async (id) => {
         const response = await axiosAPI.get<IAlbumMutation>(`/albums/${id}`);
         return response.data;
+    }
+);
+
+export const createAlbum = createAsyncThunk<void, IAlbumForm>(
+    'albums/createAlbum',
+    async (albumData) => {
+        const formData = new FormData();
+
+        const keys = Object.keys(albumData) as (keyof IAlbumForm)[];
+        keys.forEach(key => {
+            const value = albumData[key];
+            if (value !== null && value !== undefined) {
+                if (value instanceof File) {
+                    formData.append(key, value);
+                } else {
+                    formData.append(key, String(value));
+                }
+            }
+        });
+
+        const response = await axiosAPI.post<{message: string, album: IAlbum}>('/albums', formData);
+        toast.success(response.data.message);
     }
 );
 

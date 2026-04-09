@@ -53,7 +53,10 @@ artistsRouter.post('/', auth, imagesUpload.single('photo'), async (req, res, nex
 
             const artist = new Artist(newArtist);
             await artist.save();
-            res.send(artist);
+            return res.send({
+                message: 'The artist has been successfully created. Please wait for it to be published',
+                artist
+            });
         }
     } catch (e) {
         next(e);

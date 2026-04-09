@@ -65,13 +65,13 @@ const TrackCard: React.FC<Props> = ({id, artist, title, duration, track_number, 
                 {duration}
             </Typography>
 
-            {albumImage && <Box>
+            <Box>
                 <Avatar
                     variant="rounded"
                     src={`http://localhost:8000/${albumImage}`}
                     sx={{width: 45, height: 45, boxShadow: 2}}
                 />
-            </Box>}
+            </Box>
 
             {datetime && isHistory &&
                 <Box sx={{marginLeft: '10%'}}>

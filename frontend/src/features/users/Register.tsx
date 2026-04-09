@@ -15,6 +15,8 @@ const Register = () => {
         password: '',
     });
 
+    const [loadingForm, setLoadingForm] = useState<boolean>(false);
+
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
         setForm(prevState => ({...prevState, [name]: value}));
@@ -23,10 +25,13 @@ const Register = () => {
     const onSubmitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            setLoadingForm(true);
             await dispatch(register(form)).unwrap();
             navigate('/');
         } catch (e) {
             console.log(e)
+        } finally {
+            setLoadingForm(false);
         }
     };
 
@@ -43,12 +48,12 @@ const Register = () => {
             <Box
                 sx={{
                     marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                 }}
             >
-                <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
+                <Avatar sx={{m: 1, backgroundColor: "secondary.main"}}>
                     <LockOutlinedIcon/>
                 </Avatar>
                 <Typography component="h1" variant="h5">
@@ -64,11 +69,23 @@ const Register = () => {
                                 fullWidth
                                 id="username"
                                 label="Username"
+                                disabled={loadingForm}
                                 autoFocus
                                 value={form.username}
                                 onChange={onInputChange}
-                                error={Boolean(getFieldError('username'))}
-                                helperText={getFieldError('username')}
+                                error={Boolean(getFieldError("username"))}
+                                helperText={getFieldError("username")}
+                                sx={{
+                                    '& label.Mui-focused': {color: 'secondary.main'},
+                                    '& .MuiOutlinedInput-root': {
+                                        '&:hover fieldset': {
+                                            borderColor: 'secondary.main',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: 'secondary.main',
+                                        },
+                                    },
+                                }}
                             />
                         </Grid>
                         <Grid size={12}>
@@ -76,30 +93,53 @@ const Register = () => {
                                 required
                                 fullWidth
                                 name="password"
+                                disabled={loadingForm}
                                 label="Password"
                                 type="password"
                                 id="password"
                                 autoComplete="new-password"
                                 value={form.password}
                                 onChange={onInputChange}
-                                error={Boolean(getFieldError('password'))}
-                                helperText={getFieldError('password')}
+                                error={Boolean(getFieldError("password"))}
+                                helperText={getFieldError("password")}
+                                sx={{
+                                    '& label.Mui-focused': {color: 'secondary.main'},
+                                    '& .MuiOutlinedInput-root': {
+                                        '&:hover fieldset': {
+                                            borderColor: 'secondary.main',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: 'secondary.main',
+                                        },
+                                    },
+                                }}
                             />
                         </Grid>
                     </Grid>
                     <Button
                         type="submit"
                         fullWidth
+                        disabled={loadingForm}
+                        loading={loadingForm}
                         variant="contained"
-                        sx={{mt: 3, mb: 2}}
+                        sx={{mt: 3, mb: 2, backgroundColor: "secondary.main"}}
                     >
                         Sign Up
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid>
-                            <Link to='/login'>
+                            <Typography component={Link} to="/login" sx={{
+                                textDecoration: "none",
+                                fontSize: "16px",
+                                color: "text.secondary",
+                                transition: "color 0.3s ease",
+                                "&:hover": {
+                                    color: "#ccc",
+                                    cursor: "pointer"
+                                }
+                            }}>
                                 Already have an account? Sign in
-                            </Link>
+                            </Typography>
                         </Grid>
                     </Grid>
                 </Box>

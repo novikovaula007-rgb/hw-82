@@ -46,7 +46,7 @@ const run = async () => {
             isPublished: true,
             description: 'Lana Del Rey is an American singer-songwriter. Her music is noted for its melancholic exploration of glamor and romance.'
         }, {
-            name: 'Nirvama',
+            name: 'Nirvana',
             photo: null,
             user: John!._id,
             isPublished: false,
