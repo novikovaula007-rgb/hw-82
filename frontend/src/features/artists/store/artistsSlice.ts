@@ -3,6 +3,7 @@ import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
 import type {IArtist, IArtistForm} from "../../../../types";
 import {toast} from "react-toastify";
+import {isAxiosError} from "axios";
 
 interface artistsState {
     items: IArtist[],
@@ -60,6 +61,20 @@ export const createArtist = createAsyncThunk<void, IArtistForm, { state: RootSta
             }
         });
         toast.success(response.data.message);
+    }
+);
+
+export const toggleArtistPublished = createAsyncThunk<void, string, { rejectValue: string }>(
+    'artists/togglePublished',
+    async (id, {rejectWithValue, dispatch}) => {
+        try {
+            await axiosAPI.patch(`/artists/${id}/togglePublished`);
+            await dispatch(fetchArtists());
+        } catch (e) {
+            if (isAxiosError(e) && e.response && e.response.status === 400) {
+                return rejectWithValue(e.response.data);
+            }
+        }
     }
 );
 

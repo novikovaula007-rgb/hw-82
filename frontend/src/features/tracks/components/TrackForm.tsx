@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from "../../../app/hooks.ts";
 import {useEffect, useState} from "react";
 import type {ITrackForm} from "../../../../types";
 import {Box, Button, MenuItem, Stack, TextField, Typography} from "@mui/material";
-import {fetchAlbums, selectAlbums} from "../../albums/store/AlbumsSlice.ts";
+import {fetchAlbums, selectAlbums} from "../../albums/store/albumsSlice.ts";
 import {createTrack} from "../store/tracksSlice.ts";
 
 

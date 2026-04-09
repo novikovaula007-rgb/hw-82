@@ -3,6 +3,7 @@ import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
 import type {IAlbum, IAlbumForm, IAlbumMutation} from "../../../../types";
 import {toast} from "react-toastify";
+import {isAxiosError} from "axios";
 
 interface albumsState {
     items: IAlbum[],
@@ -66,6 +67,20 @@ export const createAlbum = createAsyncThunk<void, IAlbumForm, { state: RootState
             }
         });
         toast.success(response.data.message);
+    }
+);
+
+export const toggleAlbumPublished = createAsyncThunk<void, string, { rejectValue: string }>(
+    'albums/togglePublished',
+    async (id, {rejectWithValue, dispatch}) => {
+        try {
+            await axiosAPI.patch(`/albums/${id}/togglePublished`);
+            await dispatch(fetchAlbums(null));
+        } catch (e) {
+            if (isAxiosError(e) && e.response && e.response.status === 400) {
+                return rejectWithValue(e.response.data);
+            }
+        }
     }
 );
 

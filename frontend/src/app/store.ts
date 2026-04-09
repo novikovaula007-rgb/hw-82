@@ -2,7 +2,7 @@ import {combineReducers, configureStore} from "@reduxjs/toolkit";
 import {artistsReducer} from "../features/artists/store/artistsSlice.ts";
 import {FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE} from 'redux-persist';
 import storage from 'redux-persist/es/storage';
-import {albumsReducer} from "../features/albums/store/AlbumsSlice.ts";
+import {albumsReducer} from "../features/albums/store/albumsSlice.ts";
 import {tracksReducer} from "../features/tracks/store/tracksSlice.ts";
 import {trackHistoryReducer} from "../features/trackHistory/store/trackHistorySlice.ts";
 import {usersReducer} from "../features/users/store/usersSlice.ts";

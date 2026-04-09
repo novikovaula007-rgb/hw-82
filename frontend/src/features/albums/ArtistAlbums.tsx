@@ -1,6 +1,6 @@
 import {Box, Typography} from "@mui/material";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
-import {clearAlbums, fetchAlbums, selectAlbums, selectAlbumsLoading} from "./store/AlbumsSlice.ts";
+import {clearAlbums, fetchAlbums, selectAlbums, selectAlbumsLoading} from "./store/albumsSlice.ts";
 import {useEffect} from "react";
 import "./AlbumStyles.css"
 import {useNavigate, useParams} from "react-router";

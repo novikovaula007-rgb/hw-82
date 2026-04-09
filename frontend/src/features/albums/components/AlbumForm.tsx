@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import type {IAlbumForm} from "../../../../types";
 import {Box, Button, MenuItem, Stack, TextField, Typography} from "@mui/material";
 import FileInput from "../../../components/UI/FileInput/FileInput.tsx";
-import {createAlbum} from "../store/AlbumsSlice.ts";
+import {createAlbum} from "../store/albumsSlice.ts";
 import {fetchArtists, selectArtists} from "../../artists/store/artistsSlice.ts";
 
 

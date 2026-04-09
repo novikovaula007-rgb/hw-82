@@ -3,6 +3,7 @@ import {axiosAPI} from "../../../axiosAPI";
 import type {RootState} from "../../../app/store.ts";
 import type {ITrack, ITrackForm} from "../../../../types";
 import {toast} from "react-toastify";
+import {isAxiosError} from "axios";
 
 interface tracksState {
     items: ITrack[],
@@ -31,13 +32,31 @@ export const createTrack = createAsyncThunk<void, ITrackForm, { state: RootState
     async (trackData, {getState}) => {
         const token = getState().users.user?.token;
 
-        const response = await axiosAPI.post<{message: string, track: ITrack}>('/tracks', trackData, {
+        const response = await axiosAPI.post<{ message: string, track: ITrack }>('/tracks', trackData, {
             headers: {
                 'Authorization': token
             }
         });
 
         toast.success(response.data.message);
+    }
+);
+
+export const toggleTrackPublished = createAsyncThunk<void, {
+    trackID: string;
+    albumID: string;
+}, { rejectValue: string }>(
+    'tracks/togglePublished',
+    async ({trackID, albumID}, {rejectWithValue, dispatch}) => {
+        try {
+            await axiosAPI.patch(`/tracks/${trackID}/togglePublished`);
+            await dispatch(fetchTracks(albumID));
+
+        } catch (e) {
+            if (isAxiosError(e) && e.response && e.response.status === 400) {
+                return rejectWithValue(e.response.data);
+            }
+        }
     }
 );
 

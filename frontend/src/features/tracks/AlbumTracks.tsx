@@ -5,7 +5,7 @@ import {
     fetchSelectedAlbum,
     selectAlbumsLoading,
     selectSelectedAlbum
-} from "../albums/store/AlbumsSlice.ts";
+} from "../albums/store/albumsSlice.ts";
 import {useEffect} from "react";
 import "./TrackStyles.css";
 import {useNavigate, useParams} from "react-router";
