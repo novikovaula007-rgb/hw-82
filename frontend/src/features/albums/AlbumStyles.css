@@ -8,6 +8,7 @@
     -webkit-box-shadow: 1px 1px 8px 3px rgba(72, 75, 77, 0.15);
     -moz-box-shadow: 1px 1px 8px 3px rgba(72, 75, 77, 0.15);
     box-shadow: 1px 1px 8px 3px rgba(72, 75, 77, 0.15);
+    position: relative;
 }
 
 .album-card-wrapper:hover {

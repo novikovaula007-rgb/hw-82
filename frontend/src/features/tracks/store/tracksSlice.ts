@@ -35,7 +35,7 @@ export const createTrack = createAsyncThunk<void, ITrackForm>(
     }
 );
 
-export const toggleTrackPublished = createAsyncThunk<void, {
+export const toggleTrackPublished = createAsyncThunk<ITrack, {
     trackID: string;
     albumID: string;
 }, {
@@ -45,13 +45,20 @@ export const toggleTrackPublished = createAsyncThunk<void, {
     'tracks/togglePublished',
     async ({trackID, albumID}, {rejectWithValue, dispatch}) => {
         try {
-            await axiosAPI.patch(`/tracks/${trackID}/togglePublished`);
+            const response = await axiosAPI.patch<{
+                message: string,
+                track: ITrack
+            }>(`/tracks/${trackID}/togglePublished`);
+            toast.success(response.data.message);
             await dispatch(fetchTracks(albumID));
-
+            return response.data.track;
         } catch (e) {
-            if (isAxiosError(e) && e.response && e.response.status === 400) {
-                return rejectWithValue(e.response.data);
-            }
+            const errorMessage = isAxiosError(e) && e.response?.data?.error
+                ? e.response.data.error
+                : 'Something went wrong';
+
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
         }
     }
 );
@@ -76,6 +83,13 @@ const tracksSlice = createSlice({
             .addCase(fetchTracks.rejected, (state) => {
                 state.loading.loadingAllTracks = false;
             })
+            .addCase(toggleTrackPublished.fulfilled, (state, {payload}) => {
+                const index = state.items.findIndex(track => track._id === payload._id);
+
+                if (index !== -1) {
+                    state.items[index].isPublished = payload.isPublished;
+                }
+            });
     }
 });
 

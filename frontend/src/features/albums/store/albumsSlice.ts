@@ -69,12 +69,16 @@ export const toggleAlbumPublished = createAsyncThunk<void, string, { rejectValue
     'albums/togglePublished',
     async (id, {rejectWithValue, dispatch}) => {
         try {
-            await axiosAPI.patch(`/albums/${id}/togglePublished`);
+            const response = await axiosAPI.patch<{message: string}>(`/albums/${id}/togglePublished`);
+            toast.success(response.data.message);
             await dispatch(fetchAlbums(null));
         } catch (e) {
-            if (isAxiosError(e) && e.response && e.response.status === 400) {
-                return rejectWithValue(e.response.data);
-            }
+            const errorMessage = isAxiosError(e) && e.response?.data?.error
+                ? e.response.data.error
+                : 'Something went wrong';
+
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
         }
     }
 );

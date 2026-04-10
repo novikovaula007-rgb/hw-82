@@ -5,6 +5,7 @@
     justify-content: space-between;
     border-radius: 10px;
     transition: 0.3s;
+    position: relative;
 }
 
 .track-card-wrapper:hover {

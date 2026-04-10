@@ -67,12 +67,16 @@ export const toggleArtistPublished = createAsyncThunk<void, string, {
     'artists/togglePublished',
     async (id, {rejectWithValue, dispatch}) => {
         try {
-            await axiosAPI.patch(`/artists/${id}/togglePublished`);
+            const response = await axiosAPI.patch<{message: string}>(`/artists/${id}/togglePublished`);
+            toast.success(response.data.message);
             await dispatch(fetchArtists());
         } catch (e) {
-            if (isAxiosError(e) && e.response && e.response.status === 400) {
-                return rejectWithValue(e.response.data);
-            }
+            const errorMessage = isAxiosError(e) && e.response?.data?.error
+                ? e.response.data.error
+                : 'Something went wrong';
+
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
         }
     }
 );

@@ -1,5 +1,5 @@
 import "../TrackStyles.css";
-import {Avatar, Box, IconButton, Typography} from '@mui/material';
+import {Avatar, Box, Button, IconButton, Typography} from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import * as React from "react";
 import dayjs from "dayjs";
@@ -7,6 +7,9 @@ import {useAppDispatch, useAppSelector} from "../../../app/hooks.ts";
 import {addNewEntry} from "../../trackHistory/store/trackHistorySlice.ts";
 import {selectUser} from "../../users/store/usersSlice.ts";
 import {toast} from "react-toastify";
+import CardOverlay from "../../../components/UI/CardOverlay/CardOverlay.tsx";
+import {useState} from "react";
+import {fetchTracks, toggleTrackPublished} from "../store/tracksSlice.ts";
 
 interface Props {
     id: string,
@@ -15,13 +18,16 @@ interface Props {
     duration: string,
     albumImage?: string | null,
     track_number?: number,
+    albumID?: string,
     album?: string,
     isHistory?: boolean,
-    datetime?: Date
+    datetime?: Date,
+    isPublished: boolean,
 }
 
-const TrackCard: React.FC<Props> = ({id, artist, title, duration, track_number, album, isHistory = false, datetime, albumImage}) => {
+const TrackCard: React.FC<Props> = ({id, artist, title, albumID, isPublished, duration, track_number, album, isHistory = false, datetime, albumImage}) => {
     const dispatch = useAppDispatch();
+    const [toggleLoading, setToggleLoading] = useState<boolean>(false);
     const user = useAppSelector(selectUser);
 
     const toListenTrack = async () => {
@@ -34,10 +40,26 @@ const TrackCard: React.FC<Props> = ({id, artist, title, duration, track_number, 
         } catch (e) {
             console.log(e);
         }
-    }
+    };
+
+    const handleToggle = async () => {
+        try {
+            setToggleLoading(true);
+            if (albumID) {
+                await dispatch(toggleTrackPublished({trackID: id, albumID}));
+                await dispatch(fetchTracks(albumID))
+            }
+        } catch (e) {
+            console.log(e);
+        } finally {
+            setToggleLoading(false);
+        }
+    };
 
     return (
         <Box className="track-card-wrapper">
+            {!isPublished && (<CardOverlay/>)}
+
             {track_number &&
                 <Box color="text.secondary">
                     <Typography sx={{fontSize: '15px'}}>
@@ -54,12 +76,33 @@ const TrackCard: React.FC<Props> = ({id, artist, title, duration, track_number, 
                     {title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" noWrap>
-                    {artist}
+                    {artist} <span style={{color: 'purple', fontWeight: 'bold'}}>{!isPublished && 'Not published'}</span>
                 </Typography>
             </Box>
 
             {album &&
                 <Typography className="album-text-card" color="text.secondary" variant="body2">{album}</Typography>}
+
+            {user?.role === 'admin'  && (
+                <Button
+                    color="secondary"
+                    variant="contained"
+                    onClick={handleToggle}
+                    loading={toggleLoading}
+                    disabled={toggleLoading}
+                    sx={{
+                        zIndex: 2,
+                        borderRadius: '10px',
+                        fontSize: '10px',
+                        padding: '5px 10px',
+                        margin: '0 10px',
+                        fontWeight: 'bold',
+                        borderColor: 'secondary.main',
+                    }}
+                >
+                    {isPublished ? 'Suppress' : 'Publish'}
+                </Button>
+            )}
 
             <Typography sx={{textAlign: 'right', margin: '0 5%'}}>
                 {duration}
