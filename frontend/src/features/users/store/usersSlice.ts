@@ -22,11 +22,11 @@ const initialState: UsersState = {
     loginError: null,
 };
 
-export const register = createAsyncThunk<IUser, IRegisterMutation, {rejectValue: IValidationError}>(
+export const register = createAsyncThunk<IUser, IRegisterMutation, { rejectValue: IValidationError }>(
     'users/register',
     async (registerMutation, {rejectWithValue}) => {
         try {
-            const response = await axiosAPI.post<{user: IUser, message: string}>('/users', registerMutation);
+            const response = await axiosAPI.post<{ user: IUser, message: string }>('/users', registerMutation);
             toast.success(response.data.message);
             return response.data.user;
         } catch (e) {
@@ -38,11 +38,11 @@ export const register = createAsyncThunk<IUser, IRegisterMutation, {rejectValue:
     }
 );
 
-export const login = createAsyncThunk<IUser, ILoginMutation, {rejectValue: IGlobalError}>(
+export const login = createAsyncThunk<IUser, ILoginMutation, { rejectValue: IGlobalError }>(
     'users/login',
     async (loginMutation, {rejectWithValue}) => {
         try {
-            const response = await axiosAPI.post<{user: IUser, message: string}>('/users/sessions', loginMutation);
+            const response = await axiosAPI.post<{ user: IUser, message: string }>('/users/sessions', loginMutation);
             toast.success(response.data.message);
             return response.data.user;
         } catch (e) {
@@ -54,14 +54,19 @@ export const login = createAsyncThunk<IUser, ILoginMutation, {rejectValue: IGlob
     }
 );
 
+export const logout = createAsyncThunk<void, void>(
+    'users/logout',
+    async () => {
+        const response = await axiosAPI.delete<{ message: string }>('/users/sessions');
+        toast.success(response.data.message);
+    }
+);
+
+
 export const usersSlice = createSlice({
     name: "users",
     initialState,
-    reducers: {
-        logout: (state) => {
-            state.user = null;
-        }
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder.addCase(register.pending, (state) => {
             state.registerLoading = true;
@@ -88,13 +93,14 @@ export const usersSlice = createSlice({
             state.loginLoading = false;
             state.loginError = error || null;
         });
+        builder.addCase(logout.fulfilled, (state) => {
+            state.user = null;
+        });
     }
 });
 
 export const selectUser = (state: RootState) => state.users.user;
 export const selectRegisterError = (state: RootState) => state.users.registerError;
 export const selectLoginError = (state: RootState) => state.users.loginError;
-
-export const {logout} = usersSlice.actions;
 
 export const usersReducer = usersSlice.reducer;

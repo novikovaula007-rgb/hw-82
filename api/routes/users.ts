@@ -1,8 +1,7 @@
 import express from "express";
 import User from "../models/User";
-import {Error, HydratedDocument} from "mongoose";
+import {Error} from "mongoose";
 import auth, {RequestWithUser} from "../middleware/auth";
-import {IUserFields} from "../types";
 
 export const usersRouter = express.Router();
 
@@ -42,19 +41,19 @@ usersRouter.post('/sessions', async (req, res) => {
     return res.send({message: 'Username and password correct!', user});
 });
 
-usersRouter.delete('/sessions', auth, async (req, res) => {
-    const {user} = req as RequestWithUser;
+usersRouter.delete('/sessions', auth, async (req, res, next) => {
+    try {
+        const {user} = req as RequestWithUser;
 
-    if (user) {
-        user.token = '';
-        await (user as HydratedDocument<IUserFields>).save();
+        if (user) {
+            const {randomUUID} = await import('crypto');
+            await User.updateOne({_id: user._id}, {token: randomUUID()});
+            return res.send({message: 'Logged out successfully.'});
+        }
+
+        return res.status(401).send({error: 'Unauthorized'});
+    } catch (e) {
+        next(e);
     }
-
-    res.clearCookie('token', {
-        httpOnly: true,
-        sameSite: 'strict',
-    });
-
-    res.send({message: 'Logged out successfully.'});
 });
 
