@@ -84,7 +84,7 @@ const TrackCard: React.FC<Props> = ({
 
     return (
         <Box className="track-card-wrapper">
-            {!isPublished && (<CardOverlay/>)}
+            {!isPublished && !isHistory && (<CardOverlay/>)}
 
             {track_number &&
                 <Box color="text.secondary">
@@ -102,15 +102,15 @@ const TrackCard: React.FC<Props> = ({
                     {title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" noWrap>
-                    {artist} <span
-                    style={{color: 'purple', fontWeight: 'bold'}}>{!isPublished && 'Not published'}</span>
+                    {artist} {!isHistory && <span
+                    style={{color: 'purple', fontWeight: 'bold'}}>{!isPublished && 'Not published'}</span>}
                 </Typography>
             </Box>
 
             {album &&
                 <Typography className="album-text-card" color="text.secondary" variant="body2">{album}</Typography>}
 
-            {user?.role === 'admin' && (
+            {user?.role === 'admin' && !isHistory && (
                 <Button
                     color="secondary"
                     variant="contained"
