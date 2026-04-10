@@ -9,6 +9,7 @@ interface albumsState {
     items: IAlbum[],
     selectedItem: IAlbumMutation | null,
     loading: {
+        deleteLoading: string | null,
         loadingAllAlbums: boolean
     }
 }
@@ -17,6 +18,7 @@ const initialState: albumsState = {
     items: [],
     selectedItem: null,
     loading: {
+        deleteLoading: null,
         loadingAllAlbums: false
     }
 };
@@ -69,7 +71,7 @@ export const toggleAlbumPublished = createAsyncThunk<void, string, { rejectValue
     'albums/togglePublished',
     async (id, {rejectWithValue, dispatch}) => {
         try {
-            const response = await axiosAPI.patch<{message: string}>(`/albums/${id}/togglePublished`);
+            const response = await axiosAPI.patch<{ message: string }>(`/albums/${id}/togglePublished`);
             toast.success(response.data.message);
             await dispatch(fetchAlbums(null));
         } catch (e) {
@@ -79,6 +81,21 @@ export const toggleAlbumPublished = createAsyncThunk<void, string, { rejectValue
 
             toast.error(errorMessage);
             return rejectWithValue(errorMessage);
+        }
+    }
+);
+
+export const deleteAlbum = createAsyncThunk<string, string, { rejectValue: string }>(
+    'albums/delete',
+    async (id, {rejectWithValue}) => {
+        try {
+            const response = await axiosAPI.delete<{ message: string }>(`/albums/${id}`);
+            toast.success(response.data.message);
+            return id;
+        } catch (e) {
+            const error = isAxiosError(e) ? e.response?.data?.error : 'Error deleting album';
+            toast.error(error);
+            return rejectWithValue(error);
         }
     }
 );
@@ -108,12 +125,24 @@ const albumsSlice = createSlice({
             })
             .addCase(fetchSelectedAlbum.pending, (state) => {
                 state.loading.loadingAllAlbums = true;
-            }).addCase(fetchSelectedAlbum.fulfilled, (state, {payload}) => {
-            state.loading.loadingAllAlbums = false;
-            state.selectedItem = payload;
-        }).addCase(fetchSelectedAlbum.rejected, (state) => {
-            state.loading.loadingAllAlbums = false;
-        });
+            })
+            .addCase(fetchSelectedAlbum.fulfilled, (state, {payload}) => {
+                state.loading.loadingAllAlbums = false;
+                state.selectedItem = payload;
+            })
+            .addCase(fetchSelectedAlbum.rejected, (state) => {
+                state.loading.loadingAllAlbums = false;
+            })
+            .addCase(deleteAlbum.pending, (state, {meta}) => {
+                state.loading.deleteLoading = meta.arg;
+            })
+            .addCase(deleteAlbum.fulfilled, (state, {payload}) => {
+                state.loading.deleteLoading = null;
+                state.items = state.items.filter(album => album._id !== payload);
+            })
+            .addCase(deleteAlbum.rejected, (state) => {
+                state.loading.deleteLoading = null;
+            });
     }
 });
 

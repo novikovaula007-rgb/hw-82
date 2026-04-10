@@ -1,7 +1,7 @@
 import {Avatar, Box, Button, Divider, Stack, Typography} from "@mui/material";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {
-    clearSelectedAlbum,
+    clearSelectedAlbum, deleteAlbum,
     fetchSelectedAlbum,
     selectAlbumsLoading,
     selectSelectedAlbum, toggleAlbumPublished
@@ -22,6 +22,7 @@ const AlbumTracks = () => {
     const tracksLoading = useAppSelector(selectTracksLoading).loadingAllTracks;
     const albumsLoading = useAppSelector(selectAlbumsLoading).loadingAllAlbums;
     const [toggleLoading, setToggleLoading] = useState<boolean>(false);
+    const deleteLoading = useAppSelector(selectAlbumsLoading).deleteLoading;
     const selectedAlbum = useAppSelector(selectSelectedAlbum);
     const user = useAppSelector(selectUser);
 
@@ -42,6 +43,18 @@ const AlbumTracks = () => {
             setToggleLoading(false);
         }
     };
+
+    const onDelete = async () => {
+        try {
+            if (selectedAlbum) {
+                const artistId = selectedAlbum.artist._id;
+                await dispatch(deleteAlbum(selectedAlbum._id)).unwrap();
+                navigate(`/artist/${artistId}`);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -70,12 +83,13 @@ const AlbumTracks = () => {
                 {albumsLoading && <Spinner/>}
                 {!albumsLoading && selectedAlbum && (
                     <Box>
-                        <Avatar src={`http://localhost:8000/${selectedAlbum.image}`} variant="rounded" sx={{width: 200, height: 200, boxShadow: 2, marginBottom: '20px'}}/>
+                        <Avatar src={`http://localhost:8000/${selectedAlbum.image}`} variant="rounded"
+                                sx={{width: 200, height: 200, boxShadow: 2, marginBottom: '20px'}}/>
                         <Typography sx={{fontSize: '25px'}}>{selectedAlbum.title}</Typography>
                         <Typography sx={{color: '#8a8a8a'}}>{selectedAlbum.description}</Typography>
                     </Box>
                 )}
-                {user?.role === 'admin' && selectedAlbum && (
+                {selectedAlbum && user?.role === 'admin' && (
                     <>
                         <Divider sx={{margin: '20px 0'}}/>
                         <Button type="submit" variant="contained"
@@ -87,6 +101,17 @@ const AlbumTracks = () => {
                         </Button>
                     </>
                 )}
+                {selectedAlbum && (user?.role === 'admin' ||
+                        user && user._id.toString() === selectedAlbum.user.toString() && !selectedAlbum.isPublished) &&
+                    <Button type="submit" variant="contained"
+                            color="error"
+                            onClick={onDelete}
+                            loading={deleteLoading === selectedAlbum._id}
+                            disabled={deleteLoading === selectedAlbum._id}
+                            sx={{margin: '0 0 20px 10px'}}>
+                        Delete
+                    </Button>
+                }
             </Box>
             <Box>
                 <Typography sx={{marginBottom: '15px'}} variant='h4'>Tracks</Typography>
@@ -104,6 +129,7 @@ const AlbumTracks = () => {
                                               track_number={track.track_number}
                                               album={selectedAlbum.title}
                                               isPublished={track.isPublished}
+                                              userID={track.user}
                             />
                         })}
                     </Stack>

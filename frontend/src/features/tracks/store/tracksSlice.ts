@@ -8,14 +8,16 @@ import {isAxiosError} from "axios";
 interface tracksState {
     items: ITrack[],
     loading: {
-        loadingAllTracks: boolean
+        loadingAllTracks: boolean,
+        deleteLoading: string | null
     }
 }
 
 const initialState: tracksState = {
     items: [],
     loading: {
-        loadingAllTracks: false
+        loadingAllTracks: false,
+        deleteLoading: null
     }
 };
 
@@ -63,6 +65,24 @@ export const toggleTrackPublished = createAsyncThunk<ITrack, {
     }
 );
 
+export const deleteTrack = createAsyncThunk<string, string, { rejectValue: string }>(
+    'tracks/delete',
+    async (id, {rejectWithValue}) => {
+        try {
+            const response = await axiosAPI.delete<{ message: string }>(`/tracks/${id}`);
+            toast.success(response.data.message);
+            return id;
+        } catch (e) {
+            const errorMessage = isAxiosError(e) && e.response?.data?.error
+                ? e.response.data.error
+                : 'Something went wrong';
+
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
+        }
+    }
+);
+
 const tracksSlice = createSlice({
     name: "tracks",
     initialState,
@@ -89,13 +109,29 @@ const tracksSlice = createSlice({
                 if (index !== -1) {
                     state.items[index].isPublished = payload.isPublished;
                 }
+            })
+            .addCase(deleteTrack.pending, (state, {meta}) => {
+                state.loading.deleteLoading = meta.arg;
+            })
+            .addCase(deleteTrack.fulfilled, (state, {payload}) => {
+                const updatedItems = state.items.filter(track => track._id !== payload);
+
+                state.items = updatedItems
+                    .sort((a, b) => a.track_number - b.track_number)
+                    .map((track, index) => ({
+                        ...track,
+                        track_number: index + 1
+                    }));
+                state.loading.deleteLoading = null;
+            })
+            .addCase(deleteTrack.rejected, (state) => {
+                state.loading.deleteLoading = null;
             });
     }
 });
 
 export const selectTracks = (state: RootState) => state.tracks.items;
 export const selectTracksLoading = (state: RootState) => state.tracks.loading;
-
 export const {clearTracks} = tracksSlice.actions;
 
 export const tracksReducer = tracksSlice.reducer;

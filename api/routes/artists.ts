@@ -13,10 +13,16 @@ const artistsRouter = express.Router();
 artistsRouter.get('/', optionalAuth, async (req, res, next) => {
     try {
         const {user} = req as RequestWithUser;
-        const filter: Record<string, boolean> = {};
+
+        let filter: Record<string, unknown> = {};
 
         if (!user || user.role !== 'admin') {
-            filter.isPublished = true;
+            filter = {
+                $or: [
+                    {isPublished: true},
+                    ...(user ? [{user: user._id}] : [])
+                ]
+            };
         }
 
         const artists = await Artist.find(filter);
@@ -30,10 +36,17 @@ artistsRouter.get('/:artist_id', optionalAuth, async (req, res, next) => {
     try {
         const {artist_id} = req.params;
         const {user} = req as RequestWithUser;
-        const filter: Record<string, unknown> = {_id: artist_id};
+
+        let filter: Record<string, unknown> = {_id: artist_id};
 
         if (!user || user.role !== 'admin') {
-            filter.isPublished = true;
+            filter = {
+                _id: artist_id,
+                $or: [
+                    {isPublished: true},
+                    ...(user ? [{user: user._id}] : [])
+                ]
+            };
         }
 
         const artist = await Artist.findOne(filter);

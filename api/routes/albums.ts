@@ -15,14 +15,16 @@ albumsRouter.get('/', optionalAuth, async (req, res, next) => {
         const {artist} = req.query;
         const {user} = req as RequestWithUser;
 
-        const filter: Record<string, unknown> = {};
+        let filter: Record<string, unknown> = artist ? {artist} : {};
 
         if (!user || user.role !== 'admin') {
-            filter.isPublished = true;
-        }
-
-        if (artist) {
-            filter.artist = artist;
+            filter = {
+                ...filter,
+                $or: [
+                    {isPublished: true},
+                    ...(user ? [{user: user._id}] : [])
+                ]
+            };
         }
 
         const albums = await Album.find(filter)
@@ -71,11 +73,18 @@ albumsRouter.get('/:album_id', optionalAuth, async (req, res, next) => {
         const {album_id} = req.params;
         const {user} = req as RequestWithUser;
 
-        const filter: Record<string, unknown> = {_id: album_id};
+        let filter: Record<string, unknown> = {_id: album_id};
 
         if (!user || user.role !== 'admin') {
-            filter.isPublished = true;
+            filter = {
+                _id: album_id,
+                $or: [
+                    {isPublished: true},
+                    ...(user ? [{user: user._id}] : [])
+                ]
+            };
         }
+
         const album = await Album.findOne(filter).populate('artist');
         res.send(album);
     } catch (e) {

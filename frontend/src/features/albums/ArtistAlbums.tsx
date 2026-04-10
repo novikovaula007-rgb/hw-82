@@ -12,7 +12,7 @@ import {useNavigate, useParams} from "react-router";
 import Spinner from "../../components/UI/Spinner/Spinner.tsx";
 import AlbumCard from "./components/AlbumCard.tsx";
 import {
-    clearSelectedArtist,
+    clearSelectedArtist, deleteArtist,
     fetchSelectedArtist,
     selectArtistsLoading,
     selectSelectedArtist, toggleArtistPublished
@@ -26,6 +26,7 @@ const ArtistAlbums = () => {
     const albumsLoading = useAppSelector(selectAlbumsLoading).loadingAllAlbums;
     const artistLoading = useAppSelector(selectArtistsLoading).loadingAllArtists;
     const selectedArtist = useAppSelector(selectSelectedArtist);
+    const deleteLoading = useAppSelector(selectArtistsLoading).deleteLoading;
     const [toggleLoading, setToggleLoading] = useState<boolean>(false);
 
     const {artistId} = useParams();
@@ -46,6 +47,16 @@ const ArtistAlbums = () => {
         }
     };
 
+    const onDelete = async () => {
+        try {
+            if (selectedArtist) {
+                await dispatch(deleteArtist(selectedArtist._id)).unwrap();
+                navigate(`/`);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -90,6 +101,16 @@ const ArtistAlbums = () => {
                         </Button>
                     </>
                 )}
+                {selectedArtist && (user?.role === 'admin' ||
+                    user && user._id.toString() === selectedArtist.user.toString() && !selectedArtist.isPublished) && <Button type="submit" variant="contained"
+                                           color="error"
+                                           onClick={onDelete}
+                                           loading={deleteLoading === selectedArtist._id}
+                                           disabled={deleteLoading === selectedArtist._id}
+                                           sx={{margin: '0 0 20px 10px'}}>
+                    Delete
+                </Button>
+                }
             </Box>
             <Box>
                 <Typography sx={{marginBottom: '15px'}} variant='h4'>Albums</Typography>

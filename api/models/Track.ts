@@ -41,7 +41,20 @@ trackSchema.pre('save', async function () {
     } else {
         this.track_number = 1;
     }
-})
+});
+
+trackSchema.post('findOneAndDelete', async function (doc) {
+    if (doc) {
+        const remainingTracks = await mongoose.model('Track')
+            .find({album: doc.album})
+            .sort('track_number');
+
+        for (let i = 0; i < remainingTracks.length; i++) {
+            remainingTracks[i].track_number = i + 1;
+            await remainingTracks[i].save();
+        }
+    }
+});
 
 const Track = mongoose.model('Track', trackSchema);
 export default Track;

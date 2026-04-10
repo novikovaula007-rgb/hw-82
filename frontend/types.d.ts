@@ -2,6 +2,7 @@ export interface IAlbum {
     _id: string,
     title: string,
     artist: string,
+    user: string,
     release_year: number,
     description: string | null,
     image: string | null,
@@ -23,6 +24,7 @@ export interface IAlbumForm {
 export interface IArtist {
     _id: string,
     name: string,
+    user: string,
     description: string | null,
     photo: string | null,
     isPublished: boolean,
@@ -39,6 +41,7 @@ export interface ITrack {
     title: string,
     duration: string,
     album: string,
+    user: string,
     track_number: number,
     isPublished: boolean,
 }

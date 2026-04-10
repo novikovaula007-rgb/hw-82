@@ -9,6 +9,7 @@ interface artistsState {
     items: IArtist[],
     selectedItem: IArtist | null,
     loading: {
+        deleteLoading: string | null,
         loadingAllArtists: boolean
     }
 }
@@ -17,6 +18,7 @@ const initialState: artistsState = {
     items: [],
     selectedItem: null,
     loading: {
+        deleteLoading: null,
         loadingAllArtists: false
     }
 };
@@ -55,7 +57,7 @@ export const createArtist = createAsyncThunk<void, IArtistForm>(
             }
         });
 
-        const response = await axiosAPI.post<{ message: string, artist: IArtist }>('/artists');
+        const response = await axiosAPI.post<{ message: string, artist: IArtist }>('/artists', formData);
         toast.success(response.data.message);
     }
 );
@@ -67,9 +69,27 @@ export const toggleArtistPublished = createAsyncThunk<void, string, {
     'artists/togglePublished',
     async (id, {rejectWithValue, dispatch}) => {
         try {
-            const response = await axiosAPI.patch<{message: string}>(`/artists/${id}/togglePublished`);
+            const response = await axiosAPI.patch<{ message: string }>(`/artists/${id}/togglePublished`);
             toast.success(response.data.message);
             await dispatch(fetchArtists());
+        } catch (e) {
+            const errorMessage = isAxiosError(e) && e.response?.data?.error
+                ? e.response.data.error
+                : 'Something went wrong';
+
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
+        }
+    }
+);
+
+export const deleteArtist = createAsyncThunk<string, string, { rejectValue: string }>(
+    'artists/delete',
+    async (id, {rejectWithValue}) => {
+        try {
+            const response = await axiosAPI.delete<{ message: string }>(`/artists/${id}`);
+            toast.success(response.data.message);
+            return id;
         } catch (e) {
             const errorMessage = isAxiosError(e) && e.response?.data?.error
                 ? e.response.data.error
@@ -103,12 +123,24 @@ const artistsSlice = createSlice({
             })
             .addCase(fetchSelectedArtist.pending, (state) => {
                 state.loading.loadingAllArtists = true;
-            }).addCase(fetchSelectedArtist.fulfilled, (state, {payload}) => {
-            state.loading.loadingAllArtists = false;
-            state.selectedItem = payload;
-        }).addCase(fetchSelectedArtist.rejected, (state) => {
-            state.loading.loadingAllArtists = false;
-        });
+            })
+            .addCase(fetchSelectedArtist.fulfilled, (state, {payload}) => {
+                state.loading.loadingAllArtists = false;
+                state.selectedItem = payload;
+            })
+            .addCase(fetchSelectedArtist.rejected, (state) => {
+                state.loading.loadingAllArtists = false;
+            })
+            .addCase(deleteArtist.pending, (state, {meta}) => {
+                state.loading.deleteLoading = meta.arg;
+            })
+            .addCase(deleteArtist.fulfilled, (state, {payload}) => {
+                state.loading.deleteLoading = null;
+                state.items = state.items.filter(album => album._id !== payload);
+            })
+            .addCase(deleteArtist.rejected, (state) => {
+                state.loading.deleteLoading = null;
+            });
     }
 });
 

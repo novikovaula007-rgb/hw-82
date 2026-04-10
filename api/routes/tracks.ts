@@ -10,19 +10,24 @@ const tracksRouter = express.Router();
 
 tracksRouter.get('/', optionalAuth, async (req, res, next) => {
     try {
-        const album = req.query.album;
+        const albumId = req.query.album;
         const {user} = req as RequestWithUser;
 
-        const filter: Record<string, unknown> = {};
+        let filter: Record<string, unknown> = albumId ? {album: albumId} : {};
 
         if (!user || user.role !== 'admin') {
-            filter.isPublished = true;
+            filter = {
+                ...filter,
+                $or: [
+                    {isPublished: true},
+                    ...(user ? [{user: user._id}] : [])
+                ]
+            };
         }
 
-        if (album) {
-            filter.album = album;
-        }
-        const tracks = await Track.find(filter).populate('album').sort({track_number: 1});
+        const tracks = await Track.find(filter)
+            .populate('album')
+            .sort({track_number: 1});
         res.send(tracks);
     } catch (e) {
         next(e);

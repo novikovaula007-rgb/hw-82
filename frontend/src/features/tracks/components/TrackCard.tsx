@@ -1,4 +1,5 @@
 import "../TrackStyles.css";
+import DeleteIcon from '@mui/icons-material/Delete';
 import {Avatar, Box, Button, IconButton, Typography} from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import * as React from "react";
@@ -9,7 +10,8 @@ import {selectUser} from "../../users/store/usersSlice.ts";
 import {toast} from "react-toastify";
 import CardOverlay from "../../../components/UI/CardOverlay/CardOverlay.tsx";
 import {useState} from "react";
-import {fetchTracks, toggleTrackPublished} from "../store/tracksSlice.ts";
+import {deleteTrack, fetchTracks, selectTracksLoading, toggleTrackPublished} from "../store/tracksSlice.ts";
+import Spinner from "../../../components/UI/Spinner/Spinner.tsx";
 
 interface Props {
     id: string,
@@ -23,12 +25,27 @@ interface Props {
     isHistory?: boolean,
     datetime?: Date,
     isPublished: boolean,
+    userID: string,
 }
 
-const TrackCard: React.FC<Props> = ({id, artist, title, albumID, isPublished, duration, track_number, album, isHistory = false, datetime, albumImage}) => {
+const TrackCard: React.FC<Props> = ({
+                                        id,
+                                        artist,
+                                        title,
+                                        albumID,
+                                        isPublished,
+                                        duration,
+                                        track_number,
+                                        album,
+                                        userID,
+                                        isHistory = false,
+                                        datetime,
+                                        albumImage
+                                    }) => {
     const dispatch = useAppDispatch();
     const [toggleLoading, setToggleLoading] = useState<boolean>(false);
     const user = useAppSelector(selectUser);
+    const deleteLoading = useAppSelector(selectTracksLoading).deleteLoading;
 
     const toListenTrack = async () => {
         try {
@@ -56,6 +73,15 @@ const TrackCard: React.FC<Props> = ({id, artist, title, albumID, isPublished, du
         }
     };
 
+    const onDelete = async () => {
+        try {
+            await dispatch(deleteTrack(id)).unwrap();
+            if (albumID) await dispatch(fetchTracks(albumID));
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     return (
         <Box className="track-card-wrapper">
             {!isPublished && (<CardOverlay/>)}
@@ -67,7 +93,7 @@ const TrackCard: React.FC<Props> = ({id, artist, title, albumID, isPublished, du
                     </Typography>
                 </Box>
             }
-            {!isHistory && <IconButton onClick={() => toListenTrack()}>
+            {!isHistory && <IconButton onClick={() => toListenTrack()} disabled={deleteLoading === id}>
                 <PlayArrowIcon sx={{height: 38, width: 38}}/>
             </IconButton>}
 
@@ -76,14 +102,15 @@ const TrackCard: React.FC<Props> = ({id, artist, title, albumID, isPublished, du
                     {title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" noWrap>
-                    {artist} <span style={{color: 'purple', fontWeight: 'bold'}}>{!isPublished && 'Not published'}</span>
+                    {artist} <span
+                    style={{color: 'purple', fontWeight: 'bold'}}>{!isPublished && 'Not published'}</span>
                 </Typography>
             </Box>
 
             {album &&
                 <Typography className="album-text-card" color="text.secondary" variant="body2">{album}</Typography>}
 
-            {user?.role === 'admin'  && (
+            {user?.role === 'admin' && (
                 <Button
                     color="secondary"
                     variant="contained"
@@ -104,22 +131,40 @@ const TrackCard: React.FC<Props> = ({id, artist, title, albumID, isPublished, du
                 </Button>
             )}
 
-            <Typography sx={{textAlign: 'right', margin: '0 5%'}}>
+            <Typography sx={{textAlign: 'right', margin: '0 3%'}}>
                 {duration}
             </Typography>
 
-            <Box>
-                <Avatar
-                    variant="rounded"
-                    src={`http://localhost:8000/${albumImage}`}
-                    sx={{width: 45, height: 45, boxShadow: 2}}
-                />
-            </Box>
+            {isHistory &&
+                <Box>
+                    <Avatar
+                        variant="rounded"
+                        src={`http://localhost:8000/${albumImage}`}
+                        sx={{width: 45, height: 45, boxShadow: 2}}
+                    />
+                </Box>
+            }
 
             {datetime && isHistory &&
-                <Box sx={{marginLeft: '10%'}}>
+                <Box sx={{marginLeft: '5%'}}>
                     {dayjs(datetime).format('DD.MM.YYYY HH:mm')}
                 </Box>
+            }
+
+            {!isHistory && (user?.role === 'admin' ||
+                    user && user._id.toString() === userID && !isPublished) &&
+                <IconButton
+                    onClick={onDelete}
+                    disabled={deleteLoading === id}
+                    color="error"
+                    sx={{zIndex: '2'}}
+                >
+                    {deleteLoading === id ? (
+                        <Spinner/>
+                    ) : (
+                        <DeleteIcon/>
+                    )}
+                </IconButton>
             }
         </Box>
     );
