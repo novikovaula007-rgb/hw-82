@@ -6,16 +6,26 @@ import Artist from "../models/Artist";
 import auth, {RequestWithUser} from "../middleware/auth";
 import Track from "../models/Track";
 import permit from "../middleware/permit";
+import optionalAuth from "../middleware/optionalAuth";
 
 const albumsRouter = express.Router();
 
-albumsRouter.get('/', async (req, res, next) => {
+albumsRouter.get('/', optionalAuth, async (req, res, next) => {
     try {
         const {artist} = req.query;
+        const {user} = req as RequestWithUser;
 
-        const filter = artist ? {artist} : {};
+        const filter: Record<string, unknown> = {};
 
-        const albums = await Album.find(filter as Record<string, unknown>)
+        if (!user || user.role !== 'admin') {
+            filter.isPublished = true;
+        }
+
+        if (artist) {
+            filter.artist = artist;
+        }
+
+        const albums = await Album.find(filter)
             .populate('artist')
             .sort({year: -1});
         res.send(albums);
@@ -56,10 +66,17 @@ albumsRouter.post('/', auth, imagesUpload.single('image'), async (req, res, next
     }
 });
 
-albumsRouter.get('/:album_id', async (req, res, next) => {
-    const {album_id} = req.params;
+albumsRouter.get('/:album_id', optionalAuth, async (req, res, next) => {
     try {
-        const album = await Album.findById(album_id).populate('artist');
+        const {album_id} = req.params;
+        const {user} = req as RequestWithUser;
+
+        const filter: Record<string, unknown> = {_id: album_id};
+
+        if (!user || user.role !== 'admin') {
+            filter.isPublished = true;
+        }
+        const album = await Album.findOne(filter).populate('artist');
         res.send(album);
     } catch (e) {
         next(e);

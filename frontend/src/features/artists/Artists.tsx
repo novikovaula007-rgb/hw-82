@@ -9,7 +9,6 @@ const Artists = () => {
     const dispatch = useAppDispatch();
     const artists = useAppSelector(selectArtists);
     const artistsLoading = useAppSelector(selectArtistsLoading).loadingAllArtists;
-
     useEffect(() => {
         dispatch(fetchArtists());
     }, [dispatch]);

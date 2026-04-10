@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {axiosAPI} from "../../../axiosAPI";
-import type {RootState} from "../../../app/store.ts";
+import type {AppDispatch, RootState} from "../../../app/store.ts";
 import type {IArtist, IArtistForm} from "../../../../types";
 import {toast} from "react-toastify";
 import {isAxiosError} from "axios";
@@ -25,6 +25,7 @@ export const fetchArtists = createAsyncThunk<IArtist[], void>(
     "artists/fetchArtists",
     async () => {
         const response = await axiosAPI.get<IArtist[]>("artists");
+
         return response.data;
     }
 )
@@ -37,10 +38,9 @@ export const fetchSelectedArtist = createAsyncThunk<IArtist, string>(
     }
 );
 
-export const createArtist = createAsyncThunk<void, IArtistForm, { state: RootState }>(
+export const createArtist = createAsyncThunk<void, IArtistForm>(
     'artists/createArtist',
-    async (artistData, {getState}) => {
-        const token = getState().users.user?.token;
+    async (artistData) => {
         const formData = new FormData();
 
         const keys = Object.keys(artistData) as (keyof IArtistForm)[];
@@ -55,16 +55,15 @@ export const createArtist = createAsyncThunk<void, IArtistForm, { state: RootSta
             }
         });
 
-        const response = await axiosAPI.post<{ message: string, artist: IArtist }>('/artists', formData, {
-            headers: {
-                'Authorization': token
-            }
-        });
+        const response = await axiosAPI.post<{ message: string, artist: IArtist }>('/artists');
         toast.success(response.data.message);
     }
 );
 
-export const toggleArtistPublished = createAsyncThunk<void, string, { rejectValue: string }>(
+export const toggleArtistPublished = createAsyncThunk<void, string, {
+    rejectValue: string,
+    dispatch: AppDispatch
+}>(
     'artists/togglePublished',
     async (id, {rejectWithValue, dispatch}) => {
         try {

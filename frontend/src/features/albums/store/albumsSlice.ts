@@ -43,11 +43,10 @@ export const fetchSelectedAlbum = createAsyncThunk<IAlbumMutation, string>(
     }
 );
 
-export const createAlbum = createAsyncThunk<void, IAlbumForm, { state: RootState }>(
+export const createAlbum = createAsyncThunk<void, IAlbumForm>(
     'albums/createAlbum',
-    async (albumData, {getState}) => {
+    async (albumData) => {
         const formData = new FormData();
-        const token = getState().users.user?.token;
 
         const keys = Object.keys(albumData) as (keyof IAlbumForm)[];
         keys.forEach(key => {
@@ -61,11 +60,7 @@ export const createAlbum = createAsyncThunk<void, IAlbumForm, { state: RootState
             }
         });
 
-        const response = await axiosAPI.post<{ message: string, album: IAlbum }>('/albums', formData, {
-            headers: {
-                'Authorization': token
-            }
-        });
+        const response = await axiosAPI.post<{ message: string, album: IAlbum }>('/albums', formData);
         toast.success(response.data.message);
     }
 );

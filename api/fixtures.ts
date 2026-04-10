@@ -12,6 +12,7 @@ const run = async () => {
     try {
         await db.dropCollection('tracks');
         await db.dropCollection('albums');
+        await db.dropCollection('users');
         await db.dropCollection('artists');
         await db.dropCollection('trackhistories');
     } catch (e) {
@@ -29,6 +30,7 @@ const run = async () => {
         }, {
             username: 'John',
             password: '123',
+            role: 'admin',
             token: 'test-token-1235',
         },
     );

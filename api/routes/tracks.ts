@@ -4,13 +4,24 @@ import Track from "../models/Track";
 import {ITrack} from "../types";
 import auth, {RequestWithUser} from "../middleware/auth";
 import permit from "../middleware/permit";
+import optionalAuth from "../middleware/optionalAuth";
 
 const tracksRouter = express.Router();
 
-tracksRouter.get('/', async (req, res, next) => {
-    const album = req.query.album;
+tracksRouter.get('/', optionalAuth, async (req, res, next) => {
     try {
-        const filter = album ? {album: album} : {};
+        const album = req.query.album;
+        const {user} = req as RequestWithUser;
+
+        const filter: Record<string, unknown> = {};
+
+        if (!user || user.role !== 'admin') {
+            filter.isPublished = true;
+        }
+
+        if (album) {
+            filter.album = album;
+        }
         const tracks = await Track.find(filter).populate('album').sort({track_number: 1});
         res.send(tracks);
     } catch (e) {
@@ -18,16 +29,27 @@ tracksRouter.get('/', async (req, res, next) => {
     }
 });
 
-tracksRouter.get('/:artist_id', async (req, res, next) => {
-    const {artist_id} = req.params;
-
+tracksRouter.get('/:artist_id', optionalAuth, async (req, res, next) => {
     try {
+        const {artist_id} = req.params;
+
+        const {user} = req as RequestWithUser;
+
+        const filter: Record<string, unknown> = {artist: artist_id};
+
+        if (!user || user.role !== 'admin') {
+            filter.isPublished = true;
+        }
+
         if (artist_id) {
-            const albums = await Album.find({artist: artist_id});
+            const albums = await Album.find(filter);
             const albums_ids = albums.map(album => {
                 return album._id
             });
-            const tracks = await Track.find({album: albums_ids}).populate('album').sort({track_number: 1});
+            const tracks = await Track.find({
+                album: albums_ids,
+                isPublished: !user || user.role !== 'admin'
+            }).populate('album').sort({track_number: 1});
             return res.send(tracks);
         }
     } catch (e) {
@@ -92,10 +114,10 @@ tracksRouter.delete('/:track_id', auth, async (req, res, next) => {
 });
 
 tracksRouter.patch('/:id/togglePublished', auth, permit('admin'), async (req, res, next) => {
-    const {user} = req as RequestWithUser;
-    const {id} = req.params;
-
     try {
+        const {user} = req as RequestWithUser;
+        const {id} = req.params;
+
         if (user) {
             const track = await Track.findById(id);
 

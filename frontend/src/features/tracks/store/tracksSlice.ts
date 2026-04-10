@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {axiosAPI} from "../../../axiosAPI";
-import type {RootState} from "../../../app/store.ts";
+import type {AppDispatch, RootState} from "../../../app/store.ts";
 import type {ITrack, ITrackForm} from "../../../../types";
 import {toast} from "react-toastify";
 import {isAxiosError} from "axios";
@@ -27,17 +27,10 @@ export const fetchTracks = createAsyncThunk<ITrack[], string>(
     }
 );
 
-export const createTrack = createAsyncThunk<void, ITrackForm, { state: RootState }>(
+export const createTrack = createAsyncThunk<void, ITrackForm>(
     'tracks/createTrack',
-    async (trackData, {getState}) => {
-        const token = getState().users.user?.token;
-
-        const response = await axiosAPI.post<{ message: string, track: ITrack }>('/tracks', trackData, {
-            headers: {
-                'Authorization': token
-            }
-        });
-
+    async (trackData) => {
+        const response = await axiosAPI.post<{ message: string, track: ITrack }>('/tracks', trackData);
         toast.success(response.data.message);
     }
 );
@@ -45,7 +38,10 @@ export const createTrack = createAsyncThunk<void, ITrackForm, { state: RootState
 export const toggleTrackPublished = createAsyncThunk<void, {
     trackID: string;
     albumID: string;
-}, { rejectValue: string }>(
+}, {
+    rejectValue: string,
+    dispatch: AppDispatch,
+}>(
     'tracks/togglePublished',
     async ({trackID, albumID}, {rejectWithValue, dispatch}) => {
         try {
