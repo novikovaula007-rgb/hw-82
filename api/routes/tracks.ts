@@ -5,6 +5,7 @@ import {ITrack} from "../types";
 import auth, {RequestWithUser} from "../middleware/auth";
 import permit from "../middleware/permit";
 import optionalAuth from "../middleware/optionalAuth";
+import TrackHistory from "../models/TrackHistory";
 
 const tracksRouter = express.Router();
 
@@ -106,6 +107,7 @@ tracksRouter.delete('/:track_id', auth, async (req, res, next) => {
 
             if ((user.role === 'admin') || (user.role === 'user' && track.user.toString() === user._id.toString() && !track.isPublished)) {
                 await Track.findByIdAndDelete(track_id);
+                await TrackHistory.deleteMany({track: track._id});
                 return res.send({message: 'Track was successfully deleted'});
             }
 

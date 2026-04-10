@@ -7,6 +7,7 @@ import auth, {RequestWithUser} from "../middleware/auth";
 import Track from "../models/Track";
 import permit from "../middleware/permit";
 import optionalAuth from "../middleware/optionalAuth";
+import TrackHistory from "../models/TrackHistory";
 
 const artistsRouter = express.Router();
 
@@ -96,9 +97,14 @@ artistsRouter.delete('/:artist_id', auth, async (req, res, next) => {
                 const albums = await Album.find({artist: artist_id as string});
                 const albumIDArray = albums.map(album => album._id);
 
+                const tracks = await Track.find({album: {$in: albumIDArray}});
+                const trackIDArray = tracks.map(track => track._id);
+
+                await TrackHistory.deleteMany({track: {$in: trackIDArray}});
                 await Track.deleteMany({album: {$in: albumIDArray}});
                 await Album.deleteMany({artist: artist_id as string});
                 await Artist.findByIdAndDelete(artist_id);
+
                 return res.send({message: 'Artist and related albums & tracks were successfully deleted'});
             }
 

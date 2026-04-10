@@ -7,6 +7,7 @@ import auth, {RequestWithUser} from "../middleware/auth";
 import Track from "../models/Track";
 import permit from "../middleware/permit";
 import optionalAuth from "../middleware/optionalAuth";
+import TrackHistory from "../models/TrackHistory";
 
 const albumsRouter = express.Router();
 
@@ -105,9 +106,14 @@ albumsRouter.delete('/:album_id', auth, async (req, res, next) => {
             }
 
             if ((user.role === 'admin') || (user.role === 'user' && album.user.toString() === user._id.toString() && !album.isPublished)) {
+                const tracks = await Track.find({album: album_id as string});
+                const trackIds = tracks.map(track => track._id);
+
+                await TrackHistory.deleteMany({track: {$in: trackIds}});
                 await Track.deleteMany({album: album_id as string});
                 await Album.findByIdAndDelete(album_id);
-                return res.send({message: 'Album and related tracks were successfully deleted'});
+
+                return res.send({message: 'Album, related tracks and history were successfully deleted'});
             }
 
             if (user.role === 'user' && album.user.toString() !== user._id.toString()) {
