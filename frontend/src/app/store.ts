@@ -6,7 +6,6 @@ import {albumsReducer} from "../features/albums/store/albumsSlice.ts";
 import {tracksReducer} from "../features/tracks/store/tracksSlice.ts";
 import {trackHistoryReducer} from "../features/trackHistory/store/trackHistorySlice.ts";
 import {usersReducer} from "../features/users/store/usersSlice.ts";
-import {addAxiosInterceptors} from "../axiosAPI.ts";
 
 const userPersistConfig = {
     key: 'store:users',
@@ -31,8 +30,6 @@ export const store = configureStore({
             },
         }),
 });
-
-addAxiosInterceptors(store);
 
 export const persistor = persistStore(store);
 

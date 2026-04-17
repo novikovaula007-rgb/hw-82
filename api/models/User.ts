@@ -22,8 +22,7 @@ const userSchema = new mongoose.Schema<IUserFields, UserModel, UserMethods>({
         required: true
     },
     token: {
-        type: String,
-        required: true
+        type: String
     },
     role: {
         type: String,

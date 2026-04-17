@@ -3,13 +3,15 @@ import {NavLink} from "react-router-dom";
 import {useNavigate} from "react-router";
 import {useAppDispatch} from "../../app/hooks.ts";
 import {logout} from "../../features/users/store/usersSlice.ts";
+import {fetchArtists} from "../../features/artists/store/artistsSlice.ts";
 
 const UserMenu = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        await dispatch(logout());
+        await dispatch(logout()).unwrap();
+        await dispatch(fetchArtists());
         navigate('/');
     };
 

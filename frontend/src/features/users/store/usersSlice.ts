@@ -8,6 +8,8 @@ import type {RootState} from "../../../app/store.ts";
 
 interface UsersState {
     user: IUser | null;
+    logoutLoading: boolean;
+    logoutError: boolean;
     registerLoading: boolean;
     registerError: IValidationError | null;
     loginLoading: boolean;
@@ -16,6 +18,8 @@ interface UsersState {
 
 const initialState: UsersState = {
     user: null,
+    logoutLoading: false,
+    logoutError: false,
     registerLoading: false,
     registerError: null,
     loginLoading: false,
@@ -62,7 +66,6 @@ export const logout = createAsyncThunk<void, void>(
     }
 );
 
-
 export const usersSlice = createSlice({
     name: "users",
     initialState,
@@ -93,8 +96,18 @@ export const usersSlice = createSlice({
             state.loginLoading = false;
             state.loginError = error || null;
         });
+
+        builder.addCase(logout.pending, (state) => {
+            state.logoutLoading = true;
+            state.logoutError = false;
+        });
         builder.addCase(logout.fulfilled, (state) => {
+            state.logoutLoading = false;
             state.user = null;
+        });
+        builder.addCase(logout.rejected, (state) => {
+            state.logoutLoading = false;
+            state.logoutError = true;
         });
     }
 });
