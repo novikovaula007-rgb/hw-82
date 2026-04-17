@@ -15,20 +15,31 @@ const userSchema = new mongoose.Schema<IUserFields, UserModel, UserMethods>({
     username: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
     password: {
         type: String,
-        required: true
+        required: true,
     },
     token: {
-        type: String
+        type: String,
     },
     role: {
         type: String,
         enum: ['admin', 'user'],
         required: true,
-        default: 'user'
+        default: 'user',
+    },
+    displayName: {
+        type: String,
+        required: true,
+    },
+    googleID: {
+        type: String,
+    },
+    avatar: {
+        type: String,
+        default: null,
     }
 });
 

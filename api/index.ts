@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -10,8 +12,6 @@ import {usersRouter} from "./routes/users";
 import trackHistoryRouter from "./routes/track_history";
 import config from "./config";
 import cookieParser from "cookie-parser";
-
-dotenv.config();
 
 const port = 8000;
 const app = express();

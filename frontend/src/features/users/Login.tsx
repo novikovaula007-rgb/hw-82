@@ -5,6 +5,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {login, selectLoginError} from "./store/usersSlice.ts";
 import type {ILoginMutation} from "../../../types";
+import AuthButtons from "./components/AuthButtons.tsx";
 
 const Login = () => {
     const dispatch = useAppDispatch();
@@ -34,7 +35,7 @@ const Login = () => {
         <Container component="main" maxWidth="xs">
             <Box
                 sx={{
-                    marginTop: 8,
+                    marginTop: 5,
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -106,10 +107,11 @@ const Login = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{mt: 3, mb: 2, backgroundColor: "secondary.main"}}
+                        sx={{mt: 3, mb: 1, backgroundColor: "secondary.main"}}
                     >
                         Sign In
                     </Button>
+                    <AuthButtons/>
                     <Grid container justifyContent="flex-end">
                         <Grid>
                             <Typography component={Link} to="/register" sx={{

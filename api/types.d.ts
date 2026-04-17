@@ -1,34 +1,37 @@
 export interface IAlbum {
-    title: string,
-    artist: string,
-    release_year: number,
-    description: string | null,
-    image: string | null,
-    isPublished?: boolean,
+    title: string;
+    artist: string;
+    release_year: number;
+    description: string | null;
+    image: string | null;
+    isPublished?: boolean;
     user: string
 }
 
 export interface IArtist {
-    name: string,
-    description: string | null,
-    photo: string | null,
-    isPublished?: boolean,
+    name: string;
+    description: string | null;
+    photo: string | null;
+    isPublished?: boolean;
     user: string
 }
 
 export interface ITrack {
-    title: string,
-    duration: string,
-    album: string,
-    isPublished?: boolean,
+    title: string;
+    duration: string;
+    album: string;
+    isPublished?: boolean;
     user: string
 }
 
 export interface IUserFields {
-    username: string,
-    password: string,
-    role: string,
-    token: string
+    username: string;
+    password: string;
+    role: string;
+    token: string;
+    displayName?: string;
+    googleID?: string;
+    avatar?: string | null;
 }
 
 interface IArtistPopulated {
@@ -37,7 +40,7 @@ interface IArtistPopulated {
 
 interface IAlbumPopulated {
     title: string;
-    image: string,
+    image: string;
     artist: IArtistPopulated;
 }
 

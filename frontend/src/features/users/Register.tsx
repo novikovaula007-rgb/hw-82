@@ -5,6 +5,9 @@ import {Link, useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks.ts";
 import {register, selectRegisterError} from './store/usersSlice.ts';
 import type {IRegisterMutation} from "../../../types";
+import AuthButtons from "./components/AuthButtons.tsx";
+import FileInput from "../../components/UI/FileInput/FileInput.tsx";
+import {toast} from "react-toastify";
 
 const Register = () => {
     const dispatch = useAppDispatch();
@@ -13,18 +16,26 @@ const Register = () => {
     const [form, setForm] = useState<IRegisterMutation>({
         username: '',
         password: '',
+        avatar: null,
+        displayName: '',
     });
 
     const [loadingForm, setLoadingForm] = useState<boolean>(false);
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
-        setForm(prevState => ({...prevState, [name]: value}));
+        setForm(prevState => {
+            return {...prevState, [name]: value}
+        })
     };
 
     const onSubmitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            if (!form.username || !form.password || !form.displayName) {
+                toast.error('Not all required fields are filled in.');
+                return;
+            }
             setLoadingForm(true);
             await dispatch(register(form)).unwrap();
             navigate('/');
@@ -32,6 +43,15 @@ const Register = () => {
             console.log(e)
         } finally {
             setLoadingForm(false);
+        }
+    };
+
+    const fileInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, files} = e.target;
+        if (files) {
+            setForm(prevState => ({
+                ...prevState, [name]: files[0]
+            }));
         }
     };
 
@@ -47,7 +67,7 @@ const Register = () => {
         <Container component="main" maxWidth="xs">
             <Box
                 sx={{
-                    marginTop: 8,
+                    marginTop: 3,
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -90,6 +110,35 @@ const Register = () => {
                         </Grid>
                         <Grid size={12}>
                             <TextField
+                                name="displayName"
+                                required
+                                fullWidth
+                                id="displayName"
+                                label="Display name"
+                                error={Boolean(getFieldError("displayName"))}
+                                helperText={getFieldError("displayName")}
+                                value={form.displayName}
+                                onChange={onInputChange}
+                                sx={{
+                                    "& label.Mui-focused": {color: "secondary.main"},
+                                    "& .MuiOutlinedInput-root": {
+                                        "&:hover fieldset": {
+                                            borderColor: "secondary.main",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "secondary.main",
+                                        },
+                                    },
+                                }}
+                            />
+                        </Grid>
+                        <FileInput
+                            label="Avatar"
+                            name="avatar"
+                            onChange={fileInputChangeHandler}
+                        />
+                        <Grid size={12}>
+                            <TextField
                                 required
                                 fullWidth
                                 name="password"
@@ -122,10 +171,11 @@ const Register = () => {
                         disabled={loadingForm}
                         loading={loadingForm}
                         variant="contained"
-                        sx={{mt: 3, mb: 2, backgroundColor: "secondary.main"}}
+                        sx={{mt: 3, mb: 1, backgroundColor: "secondary.main"}}
                     >
                         Sign Up
                     </Button>
+                    <AuthButtons/>
                     <Grid container justifyContent="flex-end">
                         <Grid>
                             <Typography component={Link} to="/login" sx={{
