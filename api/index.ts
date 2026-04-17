@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -8,6 +9,8 @@ import tracksRouter from "./routes/tracks";
 import {usersRouter} from "./routes/users";
 import trackHistoryRouter from "./routes/track_history";
 import config from "./config";
+
+dotenv.config();
 
 const port = 8000;
 const app = express();

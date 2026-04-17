@@ -1,14 +1,12 @@
 import mongoose, {Document, Model} from "mongoose";
 import {IUserFields} from "../types";
-import bcrypt from "bcrypt";
-import {randomUUID} from "crypto";
-
-const SALT_WORK_FACTOR = 10;
+import jwt from "jsonwebtoken";
+import config from "../config";
+import argon2 from "argon2";
 
 interface UserMethods {
-    checkPassword(password: string): Promise<boolean>,
-
-    generateToken(): void
+    checkPassword: (password: string) => Promise<boolean>;
+    generateAuthToken: () => void;
 }
 
 type UserModel = Model<IUserFields, {}, UserMethods>;
@@ -45,27 +43,33 @@ userSchema.path('username').validate({
     message: 'Username already exists. Please choose another one.'
 });
 
-
 userSchema.pre('save', async function () {
     if (!this.isModified('password')) return;
 
-    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
-    this.password = await bcrypt.hash(this.password, salt);
+    try {
+        this.password = await argon2.hash(this.password, {
+            type: argon2.argon2id,
+            memoryCost: 2 ** 16,
+            timeCost: 3,
+        });
+    } catch (e) {
+        throw new Error('Error hashing password.');
+    }
 });
 
 userSchema.set('toJSON', {
     transform: (_doc, ret, _options) => {
-        const {password, ...rest} = ret;
+        const {password, token, ...rest} = ret;
         return rest;
     }
 });
 
 userSchema.methods.checkPassword = function (password: string) {
-    return bcrypt.compare(password, this.password);
+    return argon2.verify(this.password, password);
 };
 
-userSchema.methods.generateToken = function () {
-    this.token = randomUUID();
+userSchema.methods.generateAuthToken = function () {
+    this.token = jwt.sign({_id: this._id}, config.JWTSecret, {expiresIn: '30d'});
 };
 
 const User = mongoose.model<IUserFields, UserModel>('User', userSchema);

@@ -8,8 +8,8 @@ const UserMenu = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        dispatch(logout());
+    const handleLogout = async () => {
+        await dispatch(logout());
         navigate('/');
     };
 
